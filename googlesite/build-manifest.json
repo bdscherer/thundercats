@@ -1,9 +1,9 @@
 {
-  "builtAt": "2026-11-04T16:50:36.222Z",
+  "builtAt": "2026-11-04T19:59:56.156Z",
   "entry": "index.html",
   "standalone": "standalone.html",
-  "standaloneBytes": 62027827,
-  "runtimeAssets": 23,
+  "standaloneBytes": 63672190,
+  "runtimeAssets": 24,
   "files": [
     {
       "path": "index.html",
@@ -22,8 +22,8 @@
     },
     {
       "path": "standalone.html",
-      "bytes": 62027827,
-      "sha256": "2f917a98febd284db00105ed3bfb37bb7e64cc396e696752f5e5ae525faeaff2"
+      "bytes": 63672190,
+      "sha256": "211edf84ed62e1e59c8ba2d7b59a769f37fd1417550ab124c73c2244e24b23b6"
     },
     {
       "path": "src/main.js",
@@ -37,8 +37,8 @@
     },
     {
       "path": "src/game.js",
-      "bytes": 32810,
-      "sha256": "87f4ddcb4c8bb7469dd861f666d507a63c9c00b8294648ae0096162334f1974d"
+      "bytes": 34450,
+      "sha256": "e62c37f9c8caf438400b42d263ccadce693d4a0c3da19baa59e856b3a681f542"
     },
     {
       "path": "src/vehicle.js",
@@ -47,18 +47,18 @@
     },
     {
       "path": "src/vehicle-art.js",
-      "bytes": 8810,
-      "sha256": "1518dc9f27aa60cdbe261de348d34c3a9f0c23a7f1a90854a7924e7988ba89a6"
+      "bytes": 8974,
+      "sha256": "6975bcc1744f51d000669872cd32ab6f7cbc995046187706a2e1706f5a927843"
     },
     {
       "path": "src/art.js",
-      "bytes": 55171,
-      "sha256": "68bd597bd09a9aa4caba34b7faf5a94ee18c07fcbbe13dfda049cd75ff018a57"
+      "bytes": 60538,
+      "sha256": "3c359474a98dfac502ee4aaf84bb89953a382864feb53f29548855c8dcd25d1b"
     },
     {
       "path": "src/audio.js",
-      "bytes": 6282,
-      "sha256": "6467538005e8ee81d8a91ad6a8fd4419a84ba73c04d87e4e6a6be165952e6e70"
+      "bytes": 6476,
+      "sha256": "3fe5c22423de862f37a828f2827b9ee2f4636dd1332eb3a7806ac1613f00b308"
     },
     {
       "path": "src/input.js",
@@ -72,8 +72,8 @@
     },
     {
       "path": "src/data.js",
-      "bytes": 10252,
-      "sha256": "599f8fab951993372dba4fb51b84df4096b3b4f920b2a6c4ef857799ec164195"
+      "bytes": 11042,
+      "sha256": "26e9bca8642d2b6e053b97cfed937926f73654a1bd21ebfc81a89b12e4ba7e25"
     },
     {
       "path": "assets/thundercats-emblem.png",
@@ -89,6 +89,11 @@
       "path": "assets/heroes-run.png",
       "bytes": 1930057,
       "sha256": "bd90e991699d136334c95aab9a888f3dc06ed2f1727a028e9aa86dc26c27e87e"
+    },
+    {
+      "path": "assets/lion-o-run-v2.png",
+      "bytes": 1227102,
+      "sha256": "ddfe1ca542bff3481797c90b2d7643d5888bf26fa7b840a2ee1011f84b642790"
     },
     {
       "path": "assets/heroes-combo.png",

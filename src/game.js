@@ -1,4 +1,4 @@
-import {HEROES,STAGES,DIFFICULTIES,SUPPORTS,ENEMIES,SPECIAL_CHARGE,THUNDERTANK,sectionAt,clamp,dist,seeded} from './data.js';
+import {HEROES,STAGES,DIFFICULTIES,SUPPORTS,ENEMIES,SPECIAL_CHARGE,THUNDERTANK,PIT_FALL_DURATION,pitContains,sectionAt,clamp,dist,seeded} from './data.js';
 import {ATTACKS,AIR_ATTACK,INPUT_BUFFER,GRAVITY,approach} from './combat.js';
 let uid=0;
 export class Game {
@@ -17,7 +17,7 @@ export class Game {
   this.hitstop=0;this.prevCamera=0;
   for(const [i,p] of this.players.entries()){
    p.x=145+i*45;p.y=365+i*24;p.z=0;p.vz=0;p.hp=Math.max(p.hp,p.maxHp*.65);
-   Object.assign(p,{vx:0,vy:0,prevX:p.x,prevY:p.y,prevZ:0,animTime:0,walkPhase:0,actionTime:0,action:'idle',timer:0,invuln:2,downTime:0,buffer:{},attackTargets:new Set(),propTargets:new Set(),attackElapsed:0,attackDuration:0,comboTime:0,dodgeCd:0,landSquash:0,trail:[],revive:0,veil:0});
+   Object.assign(p,{vx:0,vy:0,prevX:p.x,prevY:p.y,prevZ:0,animTime:0,walkPhase:0,actionTime:0,action:'idle',timer:0,invuln:2,downTime:0,buffer:{},attackTargets:new Set(),propTargets:new Set(),attackElapsed:0,attackDuration:0,comboTime:0,dodgeCd:0,landSquash:0,trail:[],revive:0,veil:0,fall:null,pitGrace:0,pitBlink:0,safeGround:{x:p.x,y:p.y}});
   }
   this.emit('stage',{index,stage:this.stage});
  }
@@ -47,7 +47,7 @@ export class Game {
  burst(x,y,color,count=10){for(let i=0;i<count;i++)this.particles.push({x,y,vx:(this.random()-.5)*240,vy:-this.random()*190,life:.25+this.random()*.4,max:.7,size:2+this.random()*3,color});}
  floating(text,x,y,color='#fff0bd'){this.texts.push({text,x,y,life:1,max:1,color});}
  damage(target,amount,from,knock=1,impact={}){
-  if(target.hp<=0||target.invuln>0||target.action==='dodge'||(target.hero===3&&target.veil>0))return false;
+  if(target.hp<=0||target.invuln>0||target.action==='pitfall'||target.action==='dodge'||(target.hero===3&&target.veil>0))return false;
   const player='hero'in target;let blocked=player&&target.action==='guard'&&Math.sign(from.x-target.x)===target.face;
   const frontalGuard=!player&&target.type==='guard'&&target.guardBroken<=0&&!['hurt','attack','knockdown','rise'].includes(target.action)&&Math.sign(from.x-target.x)===target.face&&from.action!=='special'&&!from.summonDamage&&!impact.special;
   if(frontalGuard){
@@ -90,6 +90,7 @@ export class Game {
   this.projectiles=this.projectiles.filter(s=>s.life>0);
  }
  attack(p,special=false){
+  if(p.hp<=0||p.action==='pitfall')return false;
   const h=HEROES[p.hero];if(special){if(p.energy<100||p.specialCd>0||(p.hero===2&&this.tank)){this.emit('empty');return false;}p.energy=0;p.specialCd=1.2;p.action='special';p.actionTime=0;p.timer=.8;p.invuln=1;this.shake=7;this.emit('special',{hero:p.hero});
    if(p.hero===0){this.callThunderCats(p);return true;}
    if(p.hero===1){p.timer=.52;p.specialTargets=new Set();this.burst(p.x,p.y-35,h.color,20);return true;}
@@ -105,7 +106,7 @@ export class Game {
  }
  clearInput(){for(const p of this.players)p.buffer={};}
  bufferInputs(dt,inputs){
-  for(const p of this.players){p.buffer??={};const input=inputs[p.slot]||{};for(const action of ['attack','jump','special','dodge']){p.buffer[action]=Math.max(0,(p.buffer[action]||0)-dt);if(input[action+'Pressed']||(action==='attack'&&input.attack))p.buffer[action]=INPUT_BUFFER;}}
+  for(const p of this.players){p.buffer??={};if(p.action==='pitfall'){p.buffer={};continue;}const input=inputs[p.slot]||{};for(const action of ['attack','jump','special','dodge']){p.buffer[action]=Math.max(0,(p.buffer[action]||0)-dt);if(input[action+'Pressed']||(action==='attack'&&input.attack))p.buffer[action]=INPUT_BUFFER;}}
  }
  strikeEnemies(p){
   const h=HEROES[p.hero],move=p.move;if(!move)return;
@@ -168,8 +169,22 @@ export class Game {
   if(!call.hit&&call.time>.95){call.hit=true;const source=call.source;source.summonDamage=true;for(const e of this.enemies)if(e.hp>0&&e.x>=this.camera-80&&e.x<=this.camera+1060){e.invuln=0;this.damage(e,e.boss?Math.round(e.maxHp*.28):e.hp+1,source,2);}source.summonDamage=false;this.projectiles=[];this.shake=14;this.emit('thunderImpact');}
   this.summons=this.summons.filter(s=>s.life>0&&s.x<this.camera+1170);if(call.time>call.duration){this.call=null;this.summons=[];}
  }
+ beginPitFall(p,pit){
+  const minX=this.camera+35,maxX=Math.min(this.stage.length-65,this.camera+915,this.gate===null?Infinity:this.gate+470);
+  const candidates=[p.safeGround,{x:pit.x-36,y:p.y},{x:p.x,y:pit.y-28},{x:pit.x+pit.w+36,y:p.y},{x:p.x,y:330}].filter(Boolean).map(q=>({x:clamp(q.x,minX,maxX),y:clamp(q.y,330,460)}));
+  const safe=candidates.find(q=>Math.hypot(q.x-p.x,q.y-p.y)<260&&!this.pits.some(h=>pitContains(h,q.x,q.y,18)))||{x:clamp(p.x,minX,maxX),y:330};
+  p.fall={pit:{...pit},elapsed:0,duration:PIT_FALL_DURATION,respawn:safe};p.action='pitfall';p.actionTime=0;p.timer=PIT_FALL_DURATION;p.vx=p.vy=p.vz=p.z=0;p.invuln=0;p.comboTime=0;p.buffer={};p.trail=[];this.emit('pitFall');
+ }
+ updatePitFall(p,dt){
+  const fall=p.fall;fall.elapsed+=dt;p.buffer={};if(fall.elapsed<fall.duration)return;
+  const damage=Math.ceil(p.maxHp*.22);p.hp=Math.max(0,p.hp-damage);p.x=p.prevX=fall.respawn.x;p.y=p.prevY=fall.respawn.y;p.z=p.prevZ=p.vz=p.vx=p.vy=0;
+  p.action=p.hp>0?'idle':'down';p.actionTime=0;p.timer=0;p.fall=null;p.safeGround={x:p.x,y:p.y};p.invuln=1;p.pitGrace=1;p.pitBlink=1;p.flash=0;p.landSquash=0;p.airAttackUsed=false;
+  this.floating('-'+damage,p.x,p.y-75,'#ffb298');this.emit('pitReturn');if(p.hp<=0){p.downTime=12;this.emit('down');}
+ }
  playerUpdate(p,input,dt){
   const h=HEROES[p.hero];p.animTime+=dt;p.actionTime+=dt;p.invuln=Math.max(0,p.invuln-dt);p.flash=Math.max(0,(p.flash||0)-dt);p.hitReact=Math.max(0,(p.hitReact||0)-dt);p.cooldown=Math.max(0,p.cooldown-dt);p.dodgeCd=Math.max(0,p.dodgeCd-dt);p.specialCd=Math.max(0,p.specialCd-dt);p.comboTime-=dt;p.veil=Math.max(0,(p.veil||0)-dt);p.timer=Math.max(0,p.timer-dt);p.landSquash=Math.max(0,p.landSquash-dt);
+  p.pitGrace=Math.max(0,(p.pitGrace||0)-dt);p.pitBlink=Math.max(0,(p.pitBlink||0)-dt);
+  if(p.action==='pitfall'&&p.fall){this.updatePitFall(p,dt);return;}
   if(p.hp<=0){
    if(p.action==='out')return;
    p.downTime-=dt;let helping=false;
@@ -231,7 +246,9 @@ export class Game {
   }}
   p.x=clamp(p.x,this.camera+25,Math.min(this.stage.length-65,this.camera+925,this.gate===null?Infinity:this.gate+480));p.y=clamp(p.y,330,464);
   const travelled=Math.hypot(p.x-oldX,(p.y-oldY)/.62);if(p.action==='walk')p.walkPhase=(p.walkPhase+travelled/(p.hero===1?91:100))%1;
-  for(const pit of this.pits)if(p.x>pit.x+8&&p.x<pit.x+pit.w-8&&p.y>pit.y&&p.z<8&&p.invuln<=0){this.damage(p,Math.ceil(p.maxHp*.22),{x:p.x-p.face,face:p.face},0);p.x=pit.x-18;p.invuln=1.5;this.floating('WATCH YOUR STEP!',p.x,p.y-85,'#f7be76');}
+  const pit=p.z<8&&p.pitGrace<=0?this.pits.find(h=>pitContains(h,p.x,p.y)):null;
+  if(pit){this.beginPitFall(p,pit);return;}
+  if(p.z===0&&!this.pits.some(h=>pitContains(h,p.x,p.y,28)))p.safeGround={x:p.x,y:p.y};
   if(p.action==='walk'||p.action==='dodge'){p.trail.push({x:p.x,y:p.y,z:p.z,life:.15});if(p.trail.length>6)p.trail.shift();}p.trail.forEach(t=>t.life-=dt);p.trail=p.trail.filter(t=>t.life>0);
   for(const pick of this.pickups)if(pick.life>0&&p.z<30&&Math.abs(pick.x-p.x)<28&&Math.abs(pick.y-p.y)<25){pick.life=0;if(pick.type==='food'){p.hp=Math.min(p.maxHp,p.hp+38);this.floating('+38 HEALTH',p.x,p.y-65,'#bde49e');}else if(pick.type==='energy'){p.energy=Math.min(100,p.energy+SPECIAL_CHARGE.crystal);this.floating('+'+SPECIAL_CHARGE.crystal+' POWER',p.x,p.y-65,'#a4dfef');}else{this.score+=500;this.floating('+500',p.x,p.y-65,'#ffe9a3');}this.emit('pickup');}
  }
@@ -242,7 +259,7 @@ export class Game {
   else if(e.z>0||e.vz){e.z+=e.vz*dt;e.vz-=GRAVITY*dt;if(e.z<=0){e.z=0;e.vz=0;}}
   e.x=clamp(e.x,this.camera+8,Math.min(this.camera+950,this.stage.length-25,this.gate===null?Infinity:this.gate+450));e.y=clamp(e.y,330,464);
   if(e.hp<=0){e.dead-=dt;return;}
-  const alive=this.players.filter(p=>p.hp>0);if(!alive.length)return;
+  const alive=this.players.filter(p=>p.hp>0&&p.action!=='pitfall');if(!alive.length)return;
   let target=alive.find(p=>p.id===e.target);
   if(!target||(e.targetThink<=0&&!['attack','telegraph'].includes(e.action))){
    const cost=p=>dist(p,e)+this.enemies.filter(other=>other.id!==e.id&&other.target===p.id&&other.hp>0).length*27;
@@ -300,7 +317,7 @@ export class Game {
   for(const p of this.players)this.playerUpdate(p,inputs[p.slot]||{},dt);
   this.updateSummons(dt);
   this.updateThundertank(dt);
-  const alive=this.players.filter(p=>p.hp>0);const recoverable=this.players.some(p=>p.hp>0||p.lives>0||p.downTime>0);
+  const alive=this.players.filter(p=>p.hp>0&&p.action!=='pitfall');const recoverable=this.players.some(p=>p.hp>0||p.lives>0||p.downTime>0);
   if(!recoverable){this.status='gameover';this.emit('gameover');return;}
   for(const e of [...this.enemies]){this.enemyUpdate(e,dt);if(e.action==='walk')e.walkPhase=(e.walkPhase+Math.hypot(e.x-e.prevX,(e.y-e.prevY)/.62)/95)%1;}
   this.enemies=this.enemies.filter(e=>e.hp>0||e.dead>0);

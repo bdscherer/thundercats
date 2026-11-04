@@ -81,7 +81,13 @@ npm run test:campaign
 npm run test:vehicles
 ```
 
-The 83 unit tests cover combat, input, legacy-engine compatibility, the new single-player campaign, all eight checkpoint identities, old-save migration, steering, weapon charging, boosts, hull damage, route bosses and transitions. Retained multiplayer engine fixtures exercise backward compatibility; the playable campaign always creates one hero.
+The 93 unit tests cover combat, input, legacy-engine compatibility, the single-player campaign, all eight checkpoint identities, old-save migration, steering, weapon charging, boosts, hull damage, route bosses, transitions, and hole falls. Retained multiplayer engine fixtures exercise backward compatibility; the playable campaign always creates one hero.
+
+Holes have cracked, perspective rims with matching foot collision. Walking or landing inside plays a fall animation, removes 22% of maximum health (rounded up), and returns the hero to nearby safe ground. The hero blinks and has damage protection for one second after returning, with movement immediately available. Jump over openings or walk around them; guard, dodge and invisibility cannot prevent a fall. Lion-O uses a separate corrected eight-frame run sheet with one sword and one claw shield.
+
+`npm run test:pits` starts its own local preview server and checks all eight Lion-O run frames, left/right controls, the fall and return sequence, visible blinking, and all five ground-stage hole styles in Chromium. It saves screenshots and a report in `test-results/`.
+
+Scenery tiles overlap with soft edges, including the Cat’s Lair-to-forest transition and vertical vehicle terrain. Ground-section colors and lighting blend over 640 world pixels, with paving and cracks staying aligned. Vehicle section shading also changes gradually. `npm run test:backgrounds` starts its own server and checks section transitions, scenery coverage, the lair edge, and vehicle terrain wraps in Chromium; screenshots and measurements are saved in `test-results/`.
 
 The full campaign simulation completes all eight missions as Lion-O and Panthro without extra health or invulnerability. The vehicle simulation separately completes all three Arcade routes.
 

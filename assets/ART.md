@@ -31,6 +31,8 @@ The current visual brief: **Castle Crashers-inspired smooth hand-drawn cartoon r
 
 ## Original-series research
 
+`lion-o-run-v2.png` replaces only Lion-O's run loop. Built-in ImageGen generated a transparent 2×4 sheet from `heroes-run.png` and `heroes-hd.png`, followed by an edit removing duplicate rear arms and claw shields. All eight figures were visually checked for one sword, one claw shield and two arms. The full generation and correction prompts are saved in `lion-o-run-v2.prompt.json`. The other heroes retain their original run rows. Hole graphics are canvas geometry shared with collision; their shallow perspective rims clip the falling figure below the floor.
+
 - [Feliner](https://thundercats.org/encyclopedia/vehicles/feliner/) — `references/feliner-cartoon.webp`; [source image](https://pub-7c9c1bcdb1ea4d65af85b1853168d60d.r2.dev/legacy/06/06c3c1c6-145.webp).
 - [ThunderClaw](https://thundercats.org/encyclopedia/vehicles/thunderclaw/) — `references/thunderclaw-cartoon.webp`; [source image](https://pub-7c9c1bcdb1ea4d65af85b1853168d60d.r2.dev/legacy/80/804526ed-1.webp).
 - [Skycutter](https://thundercats.org/encyclopedia/vehicles/skycutter/) — `references/skycutter-cartoon.webp`; [source image](https://pub-7c9c1bcdb1ea4d65af85b1853168d60d.r2.dev/vehicles/skycutter/skycutter-hero.webp).

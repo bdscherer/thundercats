@@ -38,7 +38,9 @@ try{
   await page.goto(parentBase+(standalone?'/standalone':'/host'),{timeout:120000});
   const frame=await page.waitForEvent('framenavigated',{predicate:f=>f.url().startsWith(base+'/googlesite/'),timeout:1000}).catch(()=>page.frames().find(f=>f.url().startsWith(base+'/googlesite/')));
   assert.ok(frame,'Missing game frame');
-  await frame.waitForFunction(()=>window.thundercats&&Object.values(thundercats.renderer.animations).every(b=>b.ready)&&thundercats.vehicleRenderer.terrain.naturalWidth>0,{},{timeout:120000});
+  await frame.waitForFunction(()=>window.thundercats&&Object.values(thundercats.renderer.animations).every(b=>b.ready)&&thundercats.renderer.backdrops.every(img=>img.complete&&img.naturalWidth)&&thundercats.vehicleRenderer.terrain.naturalWidth>0,{},{timeout:120000});
+  const backgroundTransition=await frame.evaluate(()=>{const r=thundercats.renderer,make=camera=>{const cv=document.createElement('canvas');cv.width=960;cv.height=540;const c=cv.getContext('2d');r.world(c,0,camera,0,{scenery:[]});return c.getImageData(0,338,960,202).data;},a=make(2949.98),b=make(2950.02);let sum=0,n=0;for(let i=0;i<a.length;i+=16)for(let ch=0;ch<3;ch++){sum+=Math.abs(a[i+ch]-b[i+ch]);n++;}const tile=r.sceneryTile(r.backdrops[0],1080,540,{fade:200,both:true}),c=tile.getContext('2d');return {floorChange:sum/n,edgeAlpha:c.getImageData(0,100,1,1).data[3],centerAlpha:c.getImageData(540,100,1,1).data[3]};});
+  assert.ok(backgroundTransition.floorChange<1.5);assert.ok(backgroundTransition.edgeAlpha<2);assert.equal(backgroundTransition.centerAlpha,255);
   assert.equal(await frame.evaluate(()=>getComputedStyle(document.documentElement).color),'rgb(239, 233, 213)','Exported theme failed to apply');
   const restrictions=await frame.evaluate(()=>{let gamepadBlocked=false,storageBlocked=false;try{navigator.getGamepads();}catch{gamepadBlocked=true;}try{localStorage.getItem('tc-save');}catch{storageBlocked=true;}return {gamepadBlocked,storageBlocked};});
   assert.equal(restrictions.gamepadBlocked,true);if(standalone)assert.equal(restrictions.storageBlocked,true);
@@ -48,6 +50,8 @@ try{
   const after=await frame.evaluate(()=>({x:thundercats.game.players[0].x,focus:document.hasFocus(),active:document.activeElement?.id,view:thundercats.view}));
   assert.ok(after.x>before+30,'Arrow keys failed in iframe: '+JSON.stringify({before,after,standalone,errors}));
   await page.keyboard.press('k');await page.waitForTimeout(100);assert.ok(await frame.evaluate(()=>thundercats.game.players[0].z)>0,'Jump failed in iframe');
+  const pitReturn=await frame.evaluate(()=>{const g=thundercats.game,p=g.players[0],pit=g.pits[0];g.completed=new Set([0,1]);g.props=[];g.enemies=[];g.camera=g.prevCamera=pit.x-300;Object.assign(p,{x:pit.x+35,y:pit.y+30,z:0,vz:0,invuln:0,action:'idle',timer:0,safeGround:{x:pit.x-45,y:pit.y+30}});const hp=p.hp;g.update(1/60,[{}]);const fell=p.action==='pitfall';for(let i=0;i<100&&p.fall;i++)g.update(1/60,[{}]);return {fell,damage:hp-p.hp,expected:Math.ceil(p.maxHp*.22),blink:p.pitBlink,protection:p.invuln};});
+  assert.equal(pitReturn.fell,true);assert.equal(pitReturn.damage,pitReturn.expected);assert.equal(pitReturn.blink,1);assert.equal(pitReturn.protection,1);
   await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
   const routes=[];
   for(const [mission,vehicle] of [[1,'thundertank'],[3,'thunderclaw'],[6,'feliner']]){
@@ -61,7 +65,7 @@ try{
   }
   if(!standalone){await page.setViewportSize({width:740,height:720});await page.screenshot({path:path.join(root,'test-results','googlesite-mobile.png')});const fit=await frame.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1);assert.equal(fit,true,'Horizontal overflow inside iframe');}
   if(standalone)assert.ok(requests.every(url=>url===base+'/googlesite/standalone.html'),'Standalone loaded external files: '+requests.map(s=>s.slice(0,140)).join(', '));
-  assert.deepEqual(errors,[]);report.checks.push({name:standalone?'Standalone HTML in opaque sandbox, no storage or gamepad permission':'Hosted subdirectory in cross-origin sandbox with gamepad denied',restrictions,routes,externalRequests:standalone?requests.length:undefined,passed:true});
+  assert.deepEqual(errors,[]);report.checks.push({name:standalone?'Standalone HTML in opaque sandbox, no storage or gamepad permission':'Hosted subdirectory in cross-origin sandbox with gamepad denied',restrictions,backgroundTransition,pitReturn,routes,externalRequests:standalone?requests.length:undefined,passed:true});
   await context.close();
  }
  report.passed=true;await fs.writeFile(path.join(out,'TEST-RESULTS.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

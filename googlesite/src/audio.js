@@ -11,6 +11,8 @@ export class AudioEngine {
  event(type,data={}){if(!this.ctx||this.muted)return;const t=this.ctx.currentTime;switch(type){
   case 'hit':this.note(data.player?90:data.heavy?105:140,data.heavy?.19:.12,'triangle',data.heavy?.45:.3,t,-65);this.hiss(data.heavy?.13:.07,data.heavy?.17:.1,600);break;
   case 'land':this.hiss(.07,.035,400);this.note(66,.07,'sine',.055);break;
+  case 'pitFall':this.note(230,.6,'triangle',.1,t,-200);this.hiss(.2,.035,1600,t);break;
+  case 'pitReturn':this.note(68,.13,'triangle',.12,t,-30);this.note(210,.12,'sine',.04,t+.07,100);break;
   case 'launch':this.hiss(.12,.09,1500);this.note(180,.17,'triangle',.08,t,-120);break;
   case 'swing':this.hiss(.09,.07,2000);this.note(250,.08,'triangle',.04,t,-150);break;
   case 'block':this.note(700,.12,'square',.07,t,-300);break;

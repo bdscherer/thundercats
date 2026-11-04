@@ -68,4 +68,11 @@ export const KEYMAP = [
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const dist=(a,b)=>Math.hypot(a.x-b.x,(a.y-b.y)*1.6);
 export const sectionAt=(stage,x)=>stage.sections.reduce((section,next)=>x>=next.x?next:section,stage.sections[0]);
+export const PIT_FALL_DURATION=.72;
+// A shallow, perspective opening: use the same outline for feet collision and art.
+export function pitOutline(pit){const {x,w,y}=pit,d=Math.min(56,482-y);return [[x+w*.24,y+3],[x+w*.48,y],[x+w*.72,y+2],[x+w*.96,y+d*.2],[x+w+7,y+d*.49],[x+w*.95,y+d*.77],[x+w*.74,y+d-2],[x+w*.49,y+d],[x+w*.22,y+d-3],[x-w*.02,y+d*.75],[x-8,y+d*.45],[x+w*.04,y+d*.19]];}
+export function pitContains(pit,x,y,margin=0){
+ const cx=pit.x+pit.w*.5,cy=pit.y+Math.min(56,482-pit.y)*.5,points=pitOutline(pit).map(([px,py])=>[cx+(px-cx)*(1+margin/(pit.w*.5)),cy+(py-cy)*(1+margin/28)]);let inside=false;
+ for(let i=0,j=points.length-1;i<points.length;j=i++){const [ax,ay]=points[i],[bx,by]=points[j];if((ay>y)!==(by>y)&&x<(bx-ax)*(y-ay)/(by-ay)+ax)inside=!inside;}return inside;
+}
 export function seeded(seed=1){return ()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};}

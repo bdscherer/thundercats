@@ -17,12 +17,15 @@ export class VehicleRenderer{
   const r=this.r,c=r.ctx,ratio=r.resolutionScale||1,s=g.spec,p=g.ship,time=this.clock+=dt,scroll=blend(g.prevScroll,g.scroll,alpha),x=blend(p.prevX,p.x,alpha),y=blend(p.prevY,p.y,alpha);
   c.setTransform(ratio,0,0,ratio,0,0);c.imageSmoothingEnabled=true;c.save();if(g.shake&&!r.reducedMotion)c.translate(Math.sin(time*90)*g.shake*.5,Math.cos(time*110)*g.shake*.3);
   c.fillStyle=['#cb9c64','#326456','#161a37'][g.stage.terrain];c.fillRect(0,0,960,540);
-  if(this.terrain.complete&&this.terrain.naturalWidth){const tw=this.terrain.width/2,th=this.terrain.height/2,row=g.stage.terrain===2?1:0,col=g.stage.terrain===1?1:0,h=650,offset=scroll%h;
-   // Inset the atlas crop so smoothing cannot sample a neighboring biome.
-   for(let j=-1,yy=offset-h;yy<540;j++,yy+=h){c.save();if((Math.floor(scroll/h)-j)%2){c.translate(0,yy+h);c.scale(1,-1);c.drawImage(this.terrain,col*tw+2,row*th+2,tw-4,th-4,0,0,960,h);}else c.drawImage(this.terrain,col*tw+2,row*th+2,tw-4,th-4,0,yy,960,h);c.restore();}
+  if(this.terrain.complete&&this.terrain.naturalWidth){const tw=this.terrain.width/2,th=this.terrain.height/2,row=g.stage.terrain===2?1:0,col=g.stage.terrain===1?1:0,h=650,stride=550;
+   // Overlap top-down terrain too, keeping the crop inside its own biome.
+   for(let i=Math.floor(-scroll/stride)-1;i<=Math.floor((540-scroll)/stride);i++){
+    const tile=r.sceneryTile(this.terrain,960,h,{fade:h-stride,axis:'y',mirrorY:!!(i%2),crop:[col*tw+2,row*th+2,tw-4,th-4]});if(tile)c.drawImage(tile,0,scroll+i*stride);
+   }
   }
-  c.fillStyle=['#3e2122','#142e4a','#3d1c60'][g.stage.terrain];c.globalAlpha=g.sectionIndex*.045;c.fillRect(0,0,960,540);c.globalAlpha=1;
-  this.worldFrame={scroll,backgroundY:scroll%650,mode:'top-down',axis:'vertical',vehicle:g.stage.vehicle};
+  const distance=blend(g.prevDistance,g.distance,alpha);let shade=0;for(let i=1;i<g.stage.sections.length;i++){const t=clamp((distance-g.stage.length*i/3+400)/800,0,1);shade+=t*t*(3-2*t);}
+  c.fillStyle=['#3e2122','#142e4a','#3d1c60'][g.stage.terrain];c.globalAlpha=shade*.045;c.fillRect(0,0,960,540);c.globalAlpha=1;
+  this.worldFrame={scroll,backgroundY:scroll%550,mode:'top-down',axis:'vertical',vehicle:g.stage.vehicle};
   if(g.stage.terrain===2)for(const star of this.stars){const yy=(star.y+scroll*1.28)%540;c.fillStyle='#cbe8fa99';c.fillRect(star.x,yy,star.size,star.size+(p.boost>0?12:0));}
   for(const track of g.tracks){const yy=track.y+scroll-track.scroll;c.fillStyle='#70583d44';for(const side of [-1,1])c.fillRect(track.x+side*s.width*.31-8,yy,16,10);}
   for(const o of g.obstacles){

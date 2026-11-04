@@ -1,10 +1,10 @@
 {
-  "testedAt": "2026-11-04T17:11:51.471Z",
+  "testedAt": "2026-11-04T20:00:04.512Z",
   "scope": "Local static hosting, cross-origin sandboxed iframe, and opaque-origin standalone iframe; not a published Google Site.",
   "checks": [
     {
       "name": "Subdirectory paths, modules, artwork, MIME types, redirect and private-file protection",
-      "files": 37,
+      "files": 38,
       "passed": true
     },
     {
@@ -12,6 +12,18 @@
       "restrictions": {
         "gamepadBlocked": true,
         "storageBlocked": false
+      },
+      "backgroundTransition": {
+        "floorChange": 0.002372112211221122,
+        "edgeAlpha": 0,
+        "centerAlpha": 255
+      },
+      "pitReturn": {
+        "fell": true,
+        "damage": 28,
+        "expected": 28,
+        "blink": 1,
+        "protection": 1
       },
       "routes": [
         "thundertank",
@@ -25,6 +37,18 @@
       "restrictions": {
         "gamepadBlocked": true,
         "storageBlocked": true
+      },
+      "backgroundTransition": {
+        "floorChange": 0.002372112211221122,
+        "edgeAlpha": 0,
+        "centerAlpha": 255
+      },
+      "pitReturn": {
+        "fell": true,
+        "damage": 28,
+        "expected": 28,
+        "blink": 1,
+        "protection": 1
       },
       "routes": [
         "thundertank",
