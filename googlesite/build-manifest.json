@@ -1,0 +1,194 @@
+{
+  "builtAt": "2026-11-04T16:50:36.222Z",
+  "entry": "index.html",
+  "standalone": "standalone.html",
+  "standaloneBytes": 62027827,
+  "runtimeAssets": 23,
+  "files": [
+    {
+      "path": "index.html",
+      "bytes": 2848,
+      "sha256": "8b6e58b117bc38c809cf15f2c7fccc1c2de782d1782ba0201db985e5898ad0e2"
+    },
+    {
+      "path": "style.css",
+      "bytes": 11858,
+      "sha256": "dd97e4d6cea71e593b1a13fa38f68df52b4cc1522c2ada07bcd29be4b30e70f4"
+    },
+    {
+      "path": "embed.css",
+      "bytes": 1271,
+      "sha256": "dfe9bbdd11336ff2b9bd55d76b8096b911ff9adf07d75412dec7b6b37493d4d4"
+    },
+    {
+      "path": "standalone.html",
+      "bytes": 62027827,
+      "sha256": "2f917a98febd284db00105ed3bfb37bb7e64cc396e696752f5e5ae525faeaff2"
+    },
+    {
+      "path": "src/main.js",
+      "bytes": 17737,
+      "sha256": "8b40d854ab5a6d06ff95f3f20d05629e79f61c311fee51a36e70cc068ca9a4a3"
+    },
+    {
+      "path": "src/campaign.js",
+      "bytes": 3820,
+      "sha256": "aadfe78db3411ac362fffbc1b96858c049524415870f2e6516c3fdd93eec5060"
+    },
+    {
+      "path": "src/game.js",
+      "bytes": 32810,
+      "sha256": "87f4ddcb4c8bb7469dd861f666d507a63c9c00b8294648ae0096162334f1974d"
+    },
+    {
+      "path": "src/vehicle.js",
+      "bytes": 11705,
+      "sha256": "f135cf0d4c5eef670ea2d22c54a6cf2b4b5a196d2ec9fba7a58b504c38d8a106"
+    },
+    {
+      "path": "src/vehicle-art.js",
+      "bytes": 8810,
+      "sha256": "1518dc9f27aa60cdbe261de348d34c3a9f0c23a7f1a90854a7924e7988ba89a6"
+    },
+    {
+      "path": "src/art.js",
+      "bytes": 55171,
+      "sha256": "68bd597bd09a9aa4caba34b7faf5a94ee18c07fcbbe13dfda049cd75ff018a57"
+    },
+    {
+      "path": "src/audio.js",
+      "bytes": 6282,
+      "sha256": "6467538005e8ee81d8a91ad6a8fd4419a84ba73c04d87e4e6a6be165952e6e70"
+    },
+    {
+      "path": "src/input.js",
+      "bytes": 2408,
+      "sha256": "3b470babeba366e78bd1a6fe9889f96f891d42a303e6ab27d297446fbfb298e9"
+    },
+    {
+      "path": "src/combat.js",
+      "bytes": 1097,
+      "sha256": "a992e1cf2e0444801810278b249ea426e5ebb0de432ed1a7d0be3f59c2024fab"
+    },
+    {
+      "path": "src/data.js",
+      "bytes": 10252,
+      "sha256": "599f8fab951993372dba4fb51b84df4096b3b4f920b2a6c4ef857799ec164195"
+    },
+    {
+      "path": "assets/thundercats-emblem.png",
+      "bytes": 53884,
+      "sha256": "d87337938cac3047e1bc81ac683eb6ea3b2ae603a619bd23d66633403adef9f9"
+    },
+    {
+      "path": "assets/heroes-hd.png",
+      "bytes": 1705542,
+      "sha256": "c39eb3b6bfdc530da95ccf0634665871b0690c3b804b9d48d7835c66d7c7f6ad"
+    },
+    {
+      "path": "assets/heroes-run.png",
+      "bytes": 1930057,
+      "sha256": "bd90e991699d136334c95aab9a888f3dc06ed2f1727a028e9aa86dc26c27e87e"
+    },
+    {
+      "path": "assets/heroes-combo.png",
+      "bytes": 2072141,
+      "sha256": "666f7b4f17f70a2859e8c363281f19e3d118958d3ffd4f084bc5d997dfe57d84"
+    },
+    {
+      "path": "assets/heroes-actions.png",
+      "bytes": 1816392,
+      "sha256": "71122690e89e233d943a6f933c7f106a6707d3a2dd324ffb09ec57a19a5bdd2b"
+    },
+    {
+      "path": "assets/villains-hd.png",
+      "bytes": 2090495,
+      "sha256": "2d93b954c5d94921a988640aeaad89070b4179dd51a8501dbeb904833c330f0e"
+    },
+    {
+      "path": "assets/villains-run.png",
+      "bytes": 2201900,
+      "sha256": "5291e0250d9688321b90732e59fa1f8a0da9df5667b3ab629b5a458c5df79444"
+    },
+    {
+      "path": "assets/supports-1985.png",
+      "bytes": 1431059,
+      "sha256": "f105a854b81215cf507eb81d60a2e3f0da922de7fd90f617e74bf089b4696363"
+    },
+    {
+      "path": "assets/enemy-specialists.png",
+      "bytes": 2310824,
+      "sha256": "d0ddcfaaa5d8621acfecacb767c49bb03c5bbbd22ac700cf4da7e6332778df56"
+    },
+    {
+      "path": "assets/world-landmarks.png",
+      "bytes": 2176300,
+      "sha256": "62476831c606c393cb6f492b661e15c6f8332bf0981c719ceabdcfeba9c2c827"
+    },
+    {
+      "path": "assets/thundertank-1985.png",
+      "bytes": 2161682,
+      "sha256": "00df3a943e759ff47db88c0cc5b3fa732070c1a6288fccb3a08411f4c7bc9df0"
+    },
+    {
+      "path": "assets/boss-slythe-1985.png",
+      "bytes": 1756146,
+      "sha256": "cce66c1ff9f6e42d85472352184be1aaba25807e2b918618f6b7df11b9c7e141"
+    },
+    {
+      "path": "assets/boss-monkian-1985.png",
+      "bytes": 1828345,
+      "sha256": "6b03cfad0f86de9870a56c018eae6f77a633fc01b42a18140ae4ebe35eb7b662"
+    },
+    {
+      "path": "assets/boss-jackalman-1985.png",
+      "bytes": 1342110,
+      "sha256": "87274b909586ea3fff56bdafb85319f56248ff83f645eec7f5dbc083831837ce"
+    },
+    {
+      "path": "assets/boss-mummra-1985.png",
+      "bytes": 2003214,
+      "sha256": "ec409a1328889611296a4346964f95ec44b587740cd7eab1ffcba06be3580545"
+    },
+    {
+      "path": "assets/lair-hd.png",
+      "bytes": 2365237,
+      "sha256": "85551a17432cee38f36877d68d5c43abdea01cd6896c449597e6c39c6ef5ec2a"
+    },
+    {
+      "path": "assets/forest-hd.png",
+      "bytes": 2927474,
+      "sha256": "7e05a3bd81bf9da2d31b388f6ed18533760e799017da404d58f28bbc85f814ac"
+    },
+    {
+      "path": "assets/ruins-hd.png",
+      "bytes": 2932549,
+      "sha256": "048886d0f6bc82492b441e4a82a17939b83a39ad843279d8d8436e17fc370dc5"
+    },
+    {
+      "path": "assets/desert-hd.png",
+      "bytes": 2561962,
+      "sha256": "e3664bb32296e92aed1cb587dfa416f74308a7803a4eb4aeb3f49f55bdf28523"
+    },
+    {
+      "path": "assets/pyramid-hd.png",
+      "bytes": 2460806,
+      "sha256": "4f4fbc103f4a81bbdd4493309f3fc315360f8da8ec6d318b01c5371c08928b5d"
+    },
+    {
+      "path": "assets/vehicle-heroes-topdown.png",
+      "bytes": 1893588,
+      "sha256": "c7cd3bf2ef59cf9d5e285c27ef6cb7706ec8f6a6b75ebe490d58e07464a788b3"
+    },
+    {
+      "path": "assets/vehicle-enemies-topdown.png",
+      "bytes": 1952567,
+      "sha256": "19125377f2d810668659d3b158cddc92d259860516e526eed49505b145527e79"
+    },
+    {
+      "path": "assets/vehicle-terrain-topdown-v2.png",
+      "bytes": 2312911,
+      "sha256": "06469815d7f22c240d4b417883466d691dc76e079cbb284810e5f7bce8599613"
+    }
+  ]
+}

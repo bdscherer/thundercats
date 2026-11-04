@@ -1,0 +1,40 @@
+{
+  "testedAt": "2026-11-04T17:11:51.471Z",
+  "scope": "Local static hosting, cross-origin sandboxed iframe, and opaque-origin standalone iframe; not a published Google Site.",
+  "checks": [
+    {
+      "name": "Subdirectory paths, modules, artwork, MIME types, redirect and private-file protection",
+      "files": 37,
+      "passed": true
+    },
+    {
+      "name": "Hosted subdirectory in cross-origin sandbox with gamepad denied",
+      "restrictions": {
+        "gamepadBlocked": true,
+        "storageBlocked": false
+      },
+      "routes": [
+        "thundertank",
+        "thunderclaw",
+        "feliner"
+      ],
+      "passed": true
+    },
+    {
+      "name": "Standalone HTML in opaque sandbox, no storage or gamepad permission",
+      "restrictions": {
+        "gamepadBlocked": true,
+        "storageBlocked": true
+      },
+      "routes": [
+        "thundertank",
+        "thunderclaw",
+        "feliner"
+      ],
+      "externalRequests": 1,
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

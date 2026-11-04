@@ -1,0 +1,69 @@
+import assert from 'node:assert/strict';
+import {chromium} from 'playwright';
+import {spawn} from 'node:child_process';
+import http from 'node:http';
+import fs from 'node:fs/promises';
+import {existsSync,readdirSync} from 'node:fs';
+import {homedir} from 'node:os';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=fileURLToPath(new URL('../',import.meta.url)),out=path.join(root,'googlesite');
+const child=spawn(process.execPath,[path.join(root,'server.mjs')],{env:{...process.env,HOST:'127.0.0.1',PORT:'0'},stdio:['ignore','pipe','pipe'],windowsHide:true});
+let logs='',stderr='',browser,parent;
+child.stdout.on('data',d=>logs+=d);child.stderr.on('data',d=>stderr+=d);
+const report={testedAt:new Date().toISOString(),scope:'Local static hosting, cross-origin sandboxed iframe, and opaque-origin standalone iframe; not a published Google Site.',checks:[],errors:[]};
+try{
+ const port=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error('Server startup timed out: '+stderr)),10000);child.stdout.on('data',()=>{const m=logs.match(/Local: http:\/\/localhost:(\d+)/);if(m){clearTimeout(timer);resolve(Number(m[1]));}});child.once('error',reject);});
+ const base='http://127.0.0.1:'+port;
+ const manifest=JSON.parse(await fs.readFile(path.join(out,'build-manifest.json'),'utf8'));
+ for(const f of manifest.files){const response=await fetch(base+'/googlesite/'+f.path);assert.equal(response.status,200,f.path);if(f.path.endsWith('.js'))assert.match(response.headers.get('content-type'),/javascript/);await response.arrayBuffer();}
+ assert.equal((await fetch(base+'/googlesite',{redirect:'manual'})).status,301);
+ assert.equal((await fetch(base+'/googlesite/')).status,200);
+ for(const route of ['/googlesite/README.md','/googlesite/../package.json','/node_modules/playwright/package.json'])assert.equal((await fetch(base+route)).status,404,route);
+ report.checks.push({name:'Subdirectory paths, modules, artwork, MIME types, redirect and private-file protection',files:manifest.files.length,passed:true});
+ const snippet=await fs.readFile(path.join(out,'embed-code.html'),'utf8');
+ parent=http.createServer((req,res)=>{
+  const standalone=req.url.startsWith('/standalone'),src=base+'/googlesite/'+(standalone?'standalone.html':'index.html');
+  res.writeHead(200,{'Content-Type':'text/html','Permissions-Policy':'gamepad=()'});
+  res.end('<!doctype html><html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>body{margin:0;background:#eee;font:16px system-ui}header{padding:12px}iframe{display:block;width:100%;height:760px;border:0}</style><header>External website — embedded ThunderCats</header>'+snippet.replace(/src="[^"]+"/,'src="'+src+'"').replace('<iframe','<iframe id="game-frame" sandbox="allow-scripts'+(standalone?'':' allow-same-origin')+'"')+'</html>');
+ });
+ await new Promise(resolve=>parent.listen(0,'127.0.0.1',resolve));const parentBase='http://localhost:'+parent.address().port;
+ const cache=path.join(homedir(),'AppData','Local','ms-playwright'),exe=existsSync(cache)?readdirSync(cache).filter(n=>/^chromium-/.test(n)).map(n=>path.join(cache,n,'chrome-win','chrome.exe')).find(existsSync):undefined;
+ browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||exe});
+ await fs.mkdir(path.join(root,'test-results'),{recursive:true});
+ for(const standalone of [false,true]){
+  const context=await browser.newContext({viewport:{width:1200,height:850}}),page=await context.newPage(),errors=[],requests=[];
+  page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)errors.push(r.status()+' '+r.url().slice(0,200));});
+  page.on('request',r=>{if(/^https?:/.test(r.url())&&!r.url().startsWith(parentBase))requests.push(r.url());});
+  await page.goto(parentBase+(standalone?'/standalone':'/host'),{timeout:120000});
+  const frame=await page.waitForEvent('framenavigated',{predicate:f=>f.url().startsWith(base+'/googlesite/'),timeout:1000}).catch(()=>page.frames().find(f=>f.url().startsWith(base+'/googlesite/')));
+  assert.ok(frame,'Missing game frame');
+  await frame.waitForFunction(()=>window.thundercats&&Object.values(thundercats.renderer.animations).every(b=>b.ready)&&thundercats.vehicleRenderer.terrain.naturalWidth>0,{},{timeout:120000});
+  assert.equal(await frame.evaluate(()=>getComputedStyle(document.documentElement).color),'rgb(239, 233, 213)','Exported theme failed to apply');
+  const restrictions=await frame.evaluate(()=>{let gamepadBlocked=false,storageBlocked=false;try{navigator.getGamepads();}catch{gamepadBlocked=true;}try{localStorage.getItem('tc-save');}catch{storageBlocked=true;}return {gamepadBlocked,storageBlocked};});
+  assert.equal(restrictions.gamepadBlocked,true);if(standalone)assert.equal(restrictions.storageBlocked,true);
+  await frame.locator('#newGame').click();await frame.locator('[data-hero="0"]').click();await frame.locator('#begin').click();
+  const before=await frame.evaluate(()=>thundercats.game.players[0].x);
+  await page.keyboard.down('ArrowRight');await page.waitForTimeout(350);await page.keyboard.up('ArrowRight');
+  const after=await frame.evaluate(()=>({x:thundercats.game.players[0].x,focus:document.hasFocus(),active:document.activeElement?.id,view:thundercats.view}));
+  assert.ok(after.x>before+30,'Arrow keys failed in iframe: '+JSON.stringify({before,after,standalone,errors}));
+  await page.keyboard.press('k');await page.waitForTimeout(100);assert.ok(await frame.evaluate(()=>thundercats.game.players[0].z)>0,'Jump failed in iframe');
+  await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
+  const routes=[];
+  for(const [mission,vehicle] of [[1,'thundertank'],[3,'thunderclaw'],[6,'feliner']]){
+   await frame.selectOption('#missionStart',String(mission));await frame.locator('#begin').click();
+   await frame.waitForFunction(()=>thundercats.game.mode==='vehicle');await frame.evaluate(()=>{const g=thundercats.game;g.banner=0;g.ship.invuln=99;g.spawn(g.spec.ground?'nosediver':'skycutter',g.ship.x,g.ship.y-170);});
+   const scroll=await frame.evaluate(()=>thundercats.game.scroll);await page.keyboard.down('Space');await page.waitForTimeout(1000);await page.keyboard.up('Space');
+   const state=await frame.evaluate(()=>({mode:thundercats.game.mode,vehicle:thundercats.game.stage.vehicle,scroll:thundercats.game.scroll,energy:thundercats.game.ship.energy,frames:thundercats.renderer.animations.vehicles.frames.size}));
+   assert.equal(state.vehicle,vehicle);assert.ok(state.scroll>scroll+70);assert.equal(state.frames,6);assert.ok(state.energy>0,'Firing failed in iframe');routes.push(vehicle);
+   if(!standalone)await page.screenshot({path:path.join(root,'test-results','googlesite-'+vehicle+'.png')});
+   await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
+  }
+  if(!standalone){await page.setViewportSize({width:740,height:720});await page.screenshot({path:path.join(root,'test-results','googlesite-mobile.png')});const fit=await frame.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1);assert.equal(fit,true,'Horizontal overflow inside iframe');}
+  if(standalone)assert.ok(requests.every(url=>url===base+'/googlesite/standalone.html'),'Standalone loaded external files: '+requests.map(s=>s.slice(0,140)).join(', '));
+  assert.deepEqual(errors,[]);report.checks.push({name:standalone?'Standalone HTML in opaque sandbox, no storage or gamepad permission':'Hosted subdirectory in cross-origin sandbox with gamepad denied',restrictions,routes,externalRequests:standalone?requests.length:undefined,passed:true});
+  await context.close();
+ }
+ report.passed=true;await fs.writeFile(path.join(out,'TEST-RESULTS.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));
+}catch(error){report.passed=false;report.errors.push(error.message);await fs.writeFile(path.join(out,'TEST-RESULTS.json'),JSON.stringify(report,null,2)+'\n');throw error;}
+finally{if(browser)await browser.close();if(parent)await new Promise(resolve=>parent.close(resolve));child.kill();}

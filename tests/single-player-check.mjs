@@ -1,0 +1,54 @@
+import {chromium} from 'playwright';
+import {existsSync,readdirSync} from 'node:fs';
+import fs from 'node:fs/promises';
+import {homedir} from 'node:os';
+import path from 'node:path';
+const cache=path.join(homedir(),'AppData','Local','ms-playwright');
+const exe=existsSync(cache)?readdirSync(cache).filter(n=>/^chromium-/.test(n)).map(n=>path.join(cache,n,'chrome-win','chrome.exe')).find(existsSync):undefined;
+await fs.mkdir('test-results',{recursive:true});
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||exe});
+try{
+ const page=await browser.newPage({viewport:{width:1440,height:1050}}),errors=[];
+ await page.addInitScript(()=>{window.__pads=[];Object.defineProperty(navigator,'getGamepads',{value:()=>window.__pads});});
+ page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.url().startsWith('http://127.0.0.1:4173')&&r.status()>=400)errors.push(r.status()+' '+r.url());});
+ await page.goto('http://127.0.0.1:4173');await page.waitForFunction(()=>Object.values(thundercats.renderer.animations).every(b=>b.ready)&&thundercats.vehicleRenderer.terrain.naturalWidth>0);
+ await page.screenshot({path:'test-results/single-title.png',fullPage:true});await page.locator('#newGame').click();
+ for(const i of [1,3,2])await page.locator(`[data-hero="${i}"]`).click();
+ if(await page.locator('.hero-card.selected').count()!==1)throw new Error('Hero selection allowed more than one hero');
+ if(await page.locator('#missionStart option').count()!==8)throw new Error('Missing campaign missions');
+ await page.screenshot({path:'test-results/single-roster.png',fullPage:true});await page.locator('#begin').click();
+ if(await page.evaluate(()=>thundercats.game.players.length!==1||thundercats.game.players[0].hero!==2))throw new Error('Campaign is not single-player');
+ await page.keyboard.press('k');await page.waitForTimeout(130);if(await page.evaluate(()=>thundercats.game.players[0].z)<=0)throw new Error('On-foot jump failed');
+ await page.waitForTimeout(700);await page.evaluate(()=>{thundercats.game.banner=0;thundercats.game.players[0].energy=100;});await page.keyboard.press('l');await page.waitForTimeout(1400);
+ if(!await page.evaluate(()=>!!thundercats.game.tank))throw new Error('Panthro lost the tank special');
+ await page.screenshot({path:'test-results/single-panthro-tank.png',fullPage:true});
+ const missions=[];
+ for(const [index,vehicle,next] of [[1,'thundertank','forest'],[3,'thunderclaw','ruins'],[6,'feliner','pyramid']]){
+  await page.keyboard.press('Escape');await page.locator('#quit').click();await page.locator('#newGame').click();await page.selectOption('#missionStart',String(index));await page.locator('#begin').click();
+  await page.waitForFunction(()=>thundercats.game.mode==='vehicle');await page.waitForTimeout(600);
+  const before=await page.evaluate(()=>({x:thundercats.game.ship.x,scroll:thundercats.game.scroll}));
+  await page.keyboard.down('ArrowRight');await page.waitForTimeout(300);await page.keyboard.up('ArrowRight');await page.waitForTimeout(200);
+  const moving=await page.evaluate(()=>({x:thundercats.game.ship.x,vx:thundercats.game.ship.vx,scroll:thundercats.game.scroll,frame:thundercats.vehicleRenderer.worldFrame,players:thundercats.game.players.length,pilot:thundercats.game.players[0].hero}));
+  if(moving.x<before.x+35||moving.vx!==0||moving.scroll<before.scroll+40||moving.players!==1||moving.pilot!==2||moving.frame.axis!=='vertical'||moving.frame.vehicle!==vehicle)throw new Error('Vehicle steering/scroll failed: '+JSON.stringify(moving));
+  await page.evaluate(()=>{const g=thundercats.game;g.banner=0;g.ship.invuln=99;const e=g.spawn(g.spec.ground?'nosediver':'skycutter',g.ship.x,g.ship.y-170);e.hp=e.maxHp=1000;e.fireCd=99;});
+  await page.keyboard.down('Space');await page.waitForTimeout(1300);await page.keyboard.up('Space');
+  const fire=await page.evaluate(()=>({shots:thundercats.game.shots.length,energy:thundercats.game.ship.energy}));if(fire.energy<=0)throw new Error('Vehicle shots did not hit or charge');
+  await page.keyboard.press('k');await page.waitForTimeout(120);if(await page.evaluate(()=>thundercats.game.ship.boost)<=0)throw new Error('Vehicle boost failed');
+  await page.evaluate(()=>thundercats.game.ship.energy=100);await page.keyboard.press('l');await page.waitForTimeout(100);if(await page.evaluate(()=>thundercats.game.ship.energy)!==0)throw new Error('Vehicle special did not consume charge');
+  await page.screenshot({path:`test-results/vehicle-${vehicle}-play.png`,fullPage:true});
+  await page.keyboard.press('Escape');await page.locator('#quit').click();await page.locator('#continueGame').click();
+  if(await page.evaluate(()=>thundercats.game.stage.vehicle)!==vehicle)throw new Error('Vehicle Continue restored wrong mission');
+  await page.evaluate(()=>{const g=thundercats.game;g.banner=0;g.distance=g.stage.length-901;g.ship.invuln=99;});await page.waitForFunction(()=>thundercats.game.bossStarted);await page.waitForTimeout(2700);
+  await page.screenshot({path:`test-results/vehicle-${vehicle}-boss.png`,fullPage:true});
+  await page.evaluate(()=>{const g=thundercats.game,boss=g.enemies.find(e=>e.boss);g.hitEnemy(boss,boss.hp,false);});await page.waitForFunction(()=>thundercats.view==='stageclear');
+  const save=await page.evaluate(()=>JSON.parse(localStorage.getItem('tc-save')));if(save.missionId!==next||save.hero!==2)throw new Error('Vehicle checkpoint failed: '+JSON.stringify(save));
+  await page.locator('#nextStage').click();if(await page.evaluate(()=>thundercats.game.stage.theme)!==next)throw new Error('Vehicle-to-battle transition failed');
+  missions.push({vehicle,steering:Math.round(moving.x-before.x),scroll:Math.round(moving.scroll-before.scroll),fire,next});
+ }
+ await page.keyboard.press('Escape');await page.locator('#quit').click();await page.evaluate(()=>localStorage.setItem('tc-save',JSON.stringify({version:2,stageId:'forest',heroes:[3,1,2,0],players:[{hp:100,lives:2,energy:44}],score:1230,difficulty:'normal'})));await page.reload();await page.locator('#continueGame').click();
+ const legacy=await page.evaluate(()=>({players:thundercats.game.players.length,hero:thundercats.game.players[0].hero,stage:thundercats.game.stage.theme,score:thundercats.game.score}));
+ if(legacy.players!==1||legacy.hero!==3||legacy.stage!=='forest'||legacy.score!==1230)throw new Error('Legacy single-player migration failed: '+JSON.stringify(legacy));
+ await page.keyboard.press('Escape');await page.locator('#pauseControls').click();await page.screenshot({path:'test-results/single-controls.png',fullPage:true});await page.locator('#helpBack').click();await page.locator('#quit').click();
+ await page.setViewportSize({width:740,height:650});await page.locator('#newGame').click();await page.screenshot({path:'test-results/single-mobile-roster.png',fullPage:true});
+ if(errors.length)throw new Error(errors.join('\n'));console.log(JSON.stringify({missions,legacy,errors,screenshots:12}));
+}finally{await browser.close();}

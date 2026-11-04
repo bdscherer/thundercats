@@ -1,0 +1,31 @@
+import {chromium} from 'playwright';
+import {readdirSync,existsSync} from 'node:fs';
+import fs from 'node:fs/promises';
+import {homedir} from 'node:os';
+import path from 'node:path';
+const cache=path.join(homedir(),'AppData','Local','ms-playwright');const exe=existsSync(cache)?readdirSync(cache).filter(n=>/^chromium-/.test(n)).map(n=>path.join(cache,n,'chrome-win','chrome.exe')).find(existsSync):undefined;
+await fs.mkdir('test-results',{recursive:true});
+const browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||exe});
+let context;
+try{
+ context=await browser.newContext({viewport:{width:1280,height:720}});
+ const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://127.0.0.1:4173');await page.waitForFunction(()=>Object.values(thundercats.renderer.animations).every(b=>b.ready));
+ await page.addStyleTag({content:'.masthead,.cabinet-label,.cabinet-bottom,.page-footer{display:none}#app{padding:0;max-width:none}.cabinet{padding:0;border:0;box-shadow:none}#screen{position:fixed;inset:0;width:100vw;height:100vh;aspect-ratio:auto;border:0;border-radius:0}'});
+ await page.locator('#newGame').click();await page.locator('#begin').click();
+ await page.evaluate(()=>{const g=thundercats.game;g.banner=0;g.completed=new Set([0,1,2]);g.props=[];g.players[0].invuln=999;thundercats.renderer.resize();window.__seen={run:[],combo:[],actions:[]};for(const name of ['run','combo','actions']){const map=thundercats.renderer.animations[name].frames,get=map.get.bind(map);map.get=key=>{window.__seen[name].push(key);return get(key);};}});
+ await page.keyboard.down('d');await page.waitForTimeout(900);await page.keyboard.up('d');await page.waitForTimeout(100);
+ await page.screenshot({path:'test-results/motion-run.png'});
+ await page.keyboard.press('k');await page.waitForTimeout(100);await page.keyboard.down('j');await page.waitForTimeout(250);await page.keyboard.up('j');await page.waitForTimeout(700);
+ await page.keyboard.down('d');await page.keyboard.press('i');await page.waitForTimeout(230);await page.keyboard.up('d');await page.waitForTimeout(250);
+ await page.keyboard.down('u');await page.waitForTimeout(150);await page.keyboard.up('u');
+ await page.evaluate(()=>{const g=thundercats.game,p=g.players[0];const e=g.spawn('brute',p.x+65,p.y);Object.assign(e,{hp:2000,maxHp:2000,cooldown:99,action:'idle',timer:0});});
+ await page.keyboard.down('j');await page.waitForTimeout(2400);await page.screenshot({path:'test-results/motion-combo.png'});await page.keyboard.up('j');await page.waitForTimeout(650);
+ await page.evaluate(()=>{const g=thundercats.game,p=g.players[0];p.invuln=0;g.damage(p,5,{x:p.x+60,face:-1},.5);});await page.waitForTimeout(350);
+ await page.evaluate(()=>{const g=thundercats.game,p=g.players[0];p.energy=100;for(let i=0;i<4;i++)g.spawn('mutant',p.x+120+i*50,p.y+(i%2)*25);});
+ await page.keyboard.press('l');await page.waitForTimeout(1800);await page.screenshot({path:'test-results/motion-summon.png'});
+ const seen=await page.evaluate(()=>Object.fromEntries(Object.entries(window.__seen).map(([k,v])=>[k,[...new Set(v)].sort((a,b)=>a-b)])));
+ if(!Array.from({length:8},(_,i)=>i).every(i=>seen.run.includes(i))||seen.combo.length!==6||![0,1,2,3,4,5,6].every(i=>seen.actions.includes(i)))throw new Error('Animation states were not rendered: '+JSON.stringify(seen));
+ if(errors.length)throw new Error(errors.join('\n'));
+ await context.close();context=null;console.log(JSON.stringify({seen,errors,captures:['motion-run.png','motion-combo.png','motion-summon.png']}));
+}finally{if(context)await context.close();await browser.close();}

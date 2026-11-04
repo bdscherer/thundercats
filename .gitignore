@@ -1,0 +1,4 @@
+node_modules/
+.superdesign/tmp/
+test-results/
+*.log
