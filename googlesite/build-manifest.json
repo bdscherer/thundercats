@@ -1,14 +1,14 @@
 {
-  "builtAt": "2026-11-07T20:15:01.774Z",
+  "builtAt": "2026-11-07T20:28:04.468Z",
   "entry": "index.html",
   "standalone": "standalone.html",
-  "standaloneBytes": 86082338,
-  "runtimeAssets": 31,
+  "standaloneBytes": 94366474,
+  "runtimeAssets": 34,
   "files": [
     {
       "path": "index.html",
-      "bytes": 3260,
-      "sha256": "5f6a5157e55bad92ebd5e063975e332bdc09f81a081782226b8e941a6cd6f01d"
+      "bytes": 3259,
+      "sha256": "765b28212e9d835757b1bd970c802e57a6fc8c3f5b5e61ecfa1d8429bd05c869"
     },
     {
       "path": "style.css",
@@ -22,18 +22,18 @@
     },
     {
       "path": "standalone.html",
-      "bytes": 86082338,
-      "sha256": "41fc82c5cf6dab660c87522dd50e7bd5c61a6cf79fce98037ce928e905d6d2ba"
+      "bytes": 94366474,
+      "sha256": "9338d1a7aae59f20f08034e41f0751718320cc61d2fa400828dca225a7ea2da7"
     },
     {
       "path": "src/main.js",
-      "bytes": 18650,
-      "sha256": "77f6490186df99db707cdb6dc19acb69b4e448ba3de32df1a4b01b39d852c28d"
+      "bytes": 19380,
+      "sha256": "42016616fd71311911204ee7d3d8264c47f08346a847fe38a7a85bfa8291c13f"
     },
     {
       "path": "src/campaign.js",
-      "bytes": 5645,
-      "sha256": "1ba52e34031ed8b942e69f7987023c02e82afdc14d25b4b7bf86f84697a27593"
+      "bytes": 5878,
+      "sha256": "bce9f26ecc3e90dee5402328c5c4833764cb9b26e236ef64bab619912ddae173"
     },
     {
       "path": "src/game.js",
@@ -49,6 +49,16 @@
       "path": "src/vehicle-art.js",
       "bytes": 11049,
       "sha256": "1c69d516772a464a88187e16a0737db39ec59131a79e15f8cde460862cdd94a0"
+    },
+    {
+      "path": "src/hoverboard.js",
+      "bytes": 9026,
+      "sha256": "42a177805028b40158062696ea71bc74b387b3bfd756a70f1c88902e8ad4927b"
+    },
+    {
+      "path": "src/hoverboard-art.js",
+      "bytes": 7268,
+      "sha256": "b2cddc39b435ae81fefa487a0b366dedddcb4f651b58672a2b6f390dc48b592c"
     },
     {
       "path": "src/art.js",
@@ -234,6 +244,21 @@
       "path": "assets/boss-vehicles-1985.png",
       "bytes": 1806178,
       "sha256": "2842c24a7455389b1441ac62c10b67132b2777001c359368c37b5eddb6700b1a"
+    },
+    {
+      "path": "assets/spaceboard-riders.png",
+      "bytes": 1992391,
+      "sha256": "b1191361c86cec9dac34a9b343d1ffdc2d70985c37574bd53c81fc4598022014"
+    },
+    {
+      "path": "assets/berserker-coast.png",
+      "bytes": 2635517,
+      "sha256": "33c53150891b3d4253f796bb7f1ce7a1a2dd6b4010dc398b2216552eb58de2fb"
+    },
+    {
+      "path": "assets/hammerhand-gunboat.png",
+      "bytes": 1572037,
+      "sha256": "ebc91338e3b8cccfe4997383b7d5dceb2becba4316493de2f9146f17f1af3e22"
     }
   ]
 }

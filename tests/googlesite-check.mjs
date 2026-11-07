@@ -44,7 +44,7 @@ try{
   assert.equal(await frame.evaluate(()=>getComputedStyle(document.documentElement).color),'rgb(239, 233, 213)','Exported theme failed to apply');
   const restrictions=await frame.evaluate(()=>{let gamepadBlocked=false,storageBlocked=false;try{navigator.getGamepads();}catch{gamepadBlocked=true;}try{localStorage.getItem('tc-save');}catch{storageBlocked=true;}return {gamepadBlocked,storageBlocked};});
   assert.equal(restrictions.gamepadBlocked,true);if(standalone)assert.equal(restrictions.storageBlocked,true);
-  await frame.locator('#newGame').click();assert.equal(await frame.locator('#missionStart option').count(),18);await frame.locator('[data-hero="0"]').click();await frame.locator('#begin').click();
+  await frame.locator('#newGame').click();assert.equal(await frame.locator('#missionStart option').count(),19);await frame.locator('[data-hero="0"]').click();await frame.locator('#begin').click();
   await page.keyboard.press('3');await frame.waitForFunction(()=>thundercats.campaign.hero===2);await page.waitForTimeout(800);await page.keyboard.press('1');await frame.waitForFunction(()=>thundercats.campaign.hero===0);
   const before=await frame.evaluate(()=>thundercats.game.players[0].x);
   await page.keyboard.down('ArrowRight');await page.waitForTimeout(350);await page.keyboard.up('ArrowRight');
@@ -70,9 +70,46 @@ try{
    const bosses=await frame.evaluate(()=>{const g=thundercats.game;g.beginEncounter(g.bossEncounter);return g.enemies.filter(e=>e.boss).length;});assert.equal(bosses,id==='canopy'?1:2);expeditions.push(id);
    await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
   }
+  await frame.selectOption('#missionStart',{label:'18 · SPACE BOARDS · BERSERKER COAST'});
+  await frame.locator('#begin').click();
+  await frame.waitForFunction(()=>{
+   const a=thundercats.hoverboardRenderer;
+   return thundercats.game.mode==='hoverboard'&&a.riders?.ready&&a.coast.naturalWidth&&a.boss.naturalWidth;
+  });
+  assert.equal(await frame.locator('#heroSwitch').isVisible(),false);
+  const altitude=await frame.evaluate(()=>({lead:thundercats.game.board.y,partner:thundercats.game.partner.y}));
+  await page.keyboard.down('ArrowUp');
+  await frame.waitForFunction(before=>thundercats.game.board.y<before.lead-35&&thundercats.game.partner.y<before.partner-35,altitude);
+  await page.keyboard.up('ArrowUp');
+  await page.keyboard.down('Space');await frame.waitForFunction(()=>new Set(thundercats.game.shots.map(s=>s.color)).size===2);await page.keyboard.up('Space');
+  await page.keyboard.press('k');
+  await frame.waitForFunction(()=>thundercats.game.board.boostCd>0);
+  const flight=await frame.evaluate(()=>{const g=thundercats.game;return {y:g.board.y,partnerY:g.partner.y,scroll:g.scroll,boost:g.board.boostCd};});
+  assert.ok(flight.y<altitude.lead-35&&flight.partnerY<altitude.partner-35&&flight.scroll>0&&flight.boost>0,JSON.stringify(flight));
+  await page.keyboard.press('3');assert.equal(await frame.evaluate(()=>thundercats.campaign.hero),0);
+  await frame.evaluate(()=>{const g=thundercats.game;g.board.energy=100;});
+  await page.keyboard.press('l');await frame.waitForFunction(()=>thundercats.game.board.energy===0&&thundercats.game.pulse>0);
+  await frame.evaluate(()=>{
+   const g=thundercats.game;
+   g.distance=g.stage.length-1;g.banner=0;
+   g.update(1/60,[{}]);g.board.invuln=0;
+   const boss=g.enemies.find(e=>e.boss);
+   boss.x=783;boss.fireCd=99;
+   Object.assign(g.board,{x:328,y:321,prevX:328,prevY:321});
+   Object.assign(g.partner,{x:250,y:352,prevX:250,prevY:352});
+  });
+  await frame.waitForFunction(()=>thundercats.game.pulse===0);
+  if(!standalone)await frame.locator('#game').screenshot({path:path.join(root,'test-results','berserker-coast.png')});
+  await frame.evaluate(()=>{
+   const g=thundercats.game;g.hit(g.enemies.find(e=>e.boss),2000);
+  });
+  await frame.locator('#nextStage').click();
+  await frame.waitForFunction(()=>thundercats.game.stage.id==='pyramid'&&thundercats.view==='playing');
+  assert.equal(await frame.locator('#heroSwitch').isVisible(),true);
+  await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
   await frame.selectOption('#missionStart','0');await frame.locator('#begin').click();
   const villains=[];
-  for(let index=0;index<18;index++){
+  for(let index=0;index<19;index++){
    const state=await frame.evaluate(index=>{
     const {campaign,renderer}=thundercats;campaign.loadMission(index);const g=campaign.active;
     g.banner=0;g.texts=[];
@@ -83,6 +120,11 @@ try{
      g.enemies=g.enemies.filter(e=>e.boss);
      for(const e of g.enemies){Object.assign(e,{action:'spawn',timer:99});renderer.bossBank(e.type);}
      renderer.bossFrames={};
+    }else if(g.mode==='hoverboard'){
+     g.distance=g.stage.length-1;g.update(1/60,[{}]);
+     g.board.invuln=0;
+     const boss=g.enemies.find(e=>e.boss);
+     boss.x=790;boss.fireCd=99;
     }else{
      g.nextWave=g.nextHazard=Infinity;g.distance=g.stage.length-901;g.update(1/60,[{}]);g.ship.invuln=99;
      for(const e of g.enemies.filter(e=>e.boss))Object.assign(e,{y:155,prevY:155,fireCd:99});
@@ -91,7 +133,8 @@ try{
    },index);
    assert.deepEqual(state.bosses,state.expected,state.id);villains.push(...state.bosses);
    await frame.waitForFunction(()=>{
-    const {game:g,renderer:r,vehicleRenderer:v}=thundercats;
+    const {game:g,renderer:r,vehicleRenderer:v,hoverboardRenderer:h}=thundercats;
+    if(g.mode==='hoverboard')return h.riders.ready&&h.boss.naturalWidth&&h.coast.naturalWidth;
     return g.enemies.filter(e=>e.boss).every(e=>g.mode==='battle'?r.bossBank(e.type)?.ready&&r.bossFrames?.[e.type]:e.bossArt===undefined?r.animations.vehicleEnemies.ready:v.bossBank().ready&&v.bossBank().frames.has(e.bossArt));
    },{},{timeout:12000}).catch(async error=>{
     const banks=await frame.evaluate(()=>Object.fromEntries(Object.entries(thundercats.renderer.animations).filter(([k])=>k.startsWith('boss-')||k.startsWith('vehicle')).map(([k,b])=>[k,{ready:b.ready,frames:[...b.frames.keys()]}])));
@@ -99,11 +142,11 @@ try{
    });
    if(!standalone&&['ruins','snow-pass','plundarr','astral-gate','feliner-deep'].includes(state.id))await frame.locator('#game').screenshot({path:path.join(root,'test-results','villain-'+state.id+'.png')});
   }
-  assert.equal(villains.length,20);assert.equal(new Set(villains).size,20);
+  assert.equal(villains.length,21);assert.equal(new Set(villains).size,21);
   await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
   if(!standalone){await page.setViewportSize({width:740,height:720});await page.screenshot({path:path.join(root,'test-results','googlesite-mobile.png')});const fit=await frame.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1);assert.equal(fit,true,'Horizontal overflow inside iframe');}
   if(standalone)assert.ok(requests.every(url=>url===base+'/googlesite/standalone.html'),'Standalone loaded external files: '+requests.map(s=>s.slice(0,140)).join(', '));
-  assert.deepEqual(errors,[]);report.checks.push({name:standalone?'Standalone HTML in opaque sandbox, no storage or gamepad permission':'Hosted subdirectory in cross-origin sandbox with gamepad denied',restrictions,backgroundTransition,pitReturn,routes,expeditions,villains,heroSwitching:true,externalRequests:standalone?requests.length:undefined,passed:true});
+  assert.deepEqual(errors,[]);report.checks.push({name:standalone?'Standalone HTML in opaque sandbox, no storage or gamepad permission':'Hosted subdirectory in cross-origin sandbox with gamepad denied',restrictions,backgroundTransition,pitReturn,routes,expeditions,villains,heroSwitching:true,hoverboardControls:true,externalRequests:standalone?requests.length:undefined,passed:true});
   await context.close();
  }
  report.passed=true;await fs.writeFile(path.join(out,'TEST-RESULTS.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

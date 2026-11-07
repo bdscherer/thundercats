@@ -1,6 +1,6 @@
 # ThunderCats: Third Earth
 
-A single-player arcade fan game with eighteen missions: twelve side-scrolling beat-’em-up chapters and six top-down vehicle routes. Switch between Lion-O, Cheetara, Panthro and Tygra during play. HD inked cartoon artwork follows the original 1980s ThunderCats designs, with music and effects synthesized in real time.
+A single-player arcade fan game with nineteen missions: twelve side-scrolling beat-’em-up chapters, six top-down vehicle routes, and a side-scrolling Space Board chase starring WilyKat and WilyKit. Switch between Lion-O, Cheetara, Panthro and Tygra on foot or in the tank and aircraft. HD inked cartoon artwork follows the original 1980s ThunderCats designs, with music and effects synthesized in real time.
 
 ## Play
 
@@ -18,7 +18,7 @@ Choose one hero, a difficulty, and a starting mission. Start at mission 01 for t
 
 For another device on the same network, use the **Network** address printed in the terminal, such as `http://192.168.1.163:4173`. The server listens on all IPv4 interfaces by default. If Windows prompts, allow Node.js on the Private network. `localhost` on another device points to that device. Set `HOST=127.0.0.1` for computer-only access. Every device runs its own single-player game.
 
-## Eighteen missions
+## Nineteen missions
 
 | Mission | Boss | Signature threat |
 | --- | --- | --- |
@@ -39,17 +39,20 @@ For another device on the same network, use the **Network** address printed in t
 | 15 · Mutant Foundry | Driller | Tunnels under the hero and leaves delayed eruptions. |
 | 16 · Feliner: Deep Space | Captain Shiner · Vertus | Charged lasers sweep an entire marked column. |
 | 17 · Astral Gate | Shadowmaster and Zaxx | Crossing shadow rifts and medallion volleys. |
-| 18 · Black Pyramid | Mumm-Ra the Ever-Living | Spirit patterns, reinforcements and teleportation. |
+| 18 · Space Boards: Berserker Coast | Hammerhand | Cannon lanes and a mechanical fist after a side-scrolling chase through sea stacks. |
+| 19 · Black Pyramid | Mumm-Ra the Ever-Living | Spirit patterns, reinforcements and teleportation. |
 
 Seven new illustrated environments are packed into two background atlases and loaded when first needed. They retain the soft scenery joins and gradual section lighting. Each new ground mission has four areas with its own floor material, weather or movement mechanic, encounter formations, and a final boss arena.
 
-The campaign features 20 original-series villains in 18 encounters. No villain appears as a boss twice. Bosses have three health phases, marked windups and recovery windows. Duo bosses stagger their windups and have separate phase bars. The [art and research notes](assets/ART.md#distinct-villain-roster) document the cartoon references and game-specific adaptations.
+The campaign features 21 distinct original-series villains in 19 encounters. Bosses have three health phases, marked windups and recovery windows. Duo bosses stagger their windups and have separate phase bars. The [art and research notes](assets/ART.md#distinct-villain-roster) document the cartoon references and game-specific adaptations.
 
 Switch with **1–4**, **Q/E**, **Tab**, **RB/R1**, or the on-screen roster. Health percentage, special charge, score and continues carry across heroes; changing pilots leaves vehicle hull and weapons intact. Switching has a 0.75-second cooldown and a 1.2-second input buffer for attack recovery. It does not cancel hurt, jumps, falls or active summon sequences. Saves preserve the selected hero and stable mission identity; older final-pyramid checkpoints still load the final pyramid.
 
 The original cartoon’s Thundertank, ThunderClaw and Feliner have their own overhead artwork and handling. Vehicle routes last roughly 85–120 seconds in automated Arcade runs and include three themed sections, enemy formations, marked attack warnings, mines/rocks/asteroids, hull repairs, and a route boss. The background continues scrolling during boss encounters.
 
 Vehicle hull health is separate from the hero’s on-foot health. A destroyed vehicle spends one of the hero’s continues and returns with full hull and brief protection; no continues remaining ends the run. Defeat the boss to continue on foot with the same hero, score, special charge and remaining continues.
+
+At Berserker Coast, steer WilyKat and WilyKit together with WASD, arrow keys, or the gamepad. Hold **J / Space** to throw trick pellets from both boards. Press **K / I** to boost through danger or **L** for their charged pellet burst. The twins share armor and continues. After the gunboat fight, your selected hero resumes the campaign at the Black Pyramid.
 
 Ground chapters are 9,400–13,800 world units long, with 7–10 encounters, three or four themed sections, reinforcement waves, supplies, environmental hazards and a boss. Eight troop roles include soldiers, brutes, archers, shield guards, spear fighters, scouts, bomb throwers and spirit casters. Break shields with finishers, aerial attacks or attacks from behind. Move out of marked blasts and prioritize summoning casters.
 
@@ -124,4 +127,4 @@ Additional checks: `npm run test:motion`, `npm run test:world`, `npm run test:ta
 
 Artwork, references and generation prompts are documented in [assets/ART.md](assets/ART.md).
 
-`npm run test:expansion` starts its own server and checks all ten new missions, the 18-entry mission selector, keyboard/controller/on-screen hero switching, shared health and charge, duo boss bars, checkpoint resume, and mobile layout. It captures the new environments in `test-results/`. The expansion and iframe checks can use installed Chrome on Windows or `CHROME_PATH`. New backdrop artwork and the full built-in ImageGen prompts are documented in `assets/ART.md` and `assets/expedition-worlds.prompts.json`.
+`npm run test:expansion` starts its own server and checks the ten expedition missions, the 19-entry mission selector, keyboard/controller/on-screen hero switching, shared health and charge, duo boss bars, checkpoint resume, and mobile layout. The iframe check also tests Space Board steering, both riders’ pellets, boost, and charged burst. Both checks can use installed Chrome on Windows or `CHROME_PATH`.

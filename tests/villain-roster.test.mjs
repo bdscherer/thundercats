@@ -3,21 +3,21 @@ import assert from 'node:assert/strict';
 import {CAMPAIGN,Campaign} from '../src/campaign.js';
 import {GROUND_BOSSES} from '../src/bosses.js';
 
-test('all 18 missions spawn distinct villains, including both members of each duo',()=>{
+test('all 19 missions spawn distinct villains, including both members of each duo',()=>{
  const roster=[];
  for(const [stage,mission] of CAMPAIGN.entries()){
   const {active:g}=new Campaign({stage});
   if(g.mode==='battle')g.beginEncounter(g.bossEncounter);
-  else{g.distance=g.stage.length-901;g.update(1/60,[{}]);}
+  else{g.distance=g.stage.length-(g.mode==='hoverboard'?1:901);g.update(1/60,[{}]);}
   const names=g.enemies.filter(e=>e.boss).map(e=>e.villain);
   assert.deepEqual(names,mission.villains,mission.id);
   assert.ok(names.length>=1,mission.id);
   roster.push(...names);
  }
- assert.equal(CAMPAIGN.length,18);
+ assert.equal(CAMPAIGN.length,19);
  assert.equal(CAMPAIGN.filter(m=>m.villains.length===2).length,2);
- assert.equal(roster.length,20);
- assert.equal(new Set(roster).size,20);
+ assert.equal(roster.length,21);
+ assert.equal(new Set(roster).size,21);
 });
 
 function signature(id){

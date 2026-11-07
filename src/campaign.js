@@ -2,9 +2,10 @@ import {VEHICLE_VILLAINS} from './bosses.js';
 import {Game} from './game.js';
 import {HEROES,STAGES,EXTRA_STAGES,DIFFICULTIES,clamp} from './data.js';
 import {VehicleGame,VEHICLE_MISSIONS,EXTRA_VEHICLE_MISSIONS} from './vehicle.js';
+import {HoverboardGame,HOVERBOARD_MISSION} from './hoverboard.js';
 export const CAMPAIGN=[
  {id:'lair',ground:0},VEHICLE_MISSIONS[0],{id:'forest',ground:1},VEHICLE_MISSIONS[1],{id:'ruins',ground:2},{id:'desert',ground:3},VEHICLE_MISSIONS[2],
- EXTRA_STAGES[0],EXTRA_STAGES[1],EXTRA_VEHICLE_MISSIONS[0],EXTRA_STAGES[2],EXTRA_STAGES[3],EXTRA_VEHICLE_MISSIONS[1],EXTRA_STAGES[4],EXTRA_STAGES[5],EXTRA_VEHICLE_MISSIONS[2],EXTRA_STAGES[6],{id:'pyramid',ground:4}
+ EXTRA_STAGES[0],EXTRA_STAGES[1],EXTRA_VEHICLE_MISSIONS[0],EXTRA_STAGES[2],EXTRA_STAGES[3],EXTRA_VEHICLE_MISSIONS[1],EXTRA_STAGES[4],EXTRA_STAGES[5],EXTRA_VEHICLE_MISSIONS[2],EXTRA_STAGES[6],HOVERBOARD_MISSION,{id:'pyramid',ground:4}
 ].map(m=>{const stage=m.ground===undefined?m:{...STAGES[m.ground],...m,mode:'battle'};return {...stage,villains:stage.mode==='vehicle'?[VEHICLE_VILLAINS[stage.bossType].id]:[stage.bossType,stage.bossPair].filter(Boolean)};});
 export class Campaign{
  constructor({heroes=[0],hero=heroes[0],difficulty='normal',stage=0,onEvent=()=>{},pilot,score=0,kills=0,time=0,bestCombo=0}={}){
@@ -36,11 +37,13 @@ export class Campaign{
    this.active.solo=true;this.active.campaignNumber=index+1;
   }else{
    const pilot=stats.pilot||{hero:this.hero,slot:0,hp:HEROES[this.hero].hp,maxHp:HEROES[this.hero].hp,lives:(DIFFICULTIES[this.difficulty]||DIFFICULTIES.normal).lives,energy:0,kills:0,score:0};
-   this.active=new VehicleGame({...stats,mission:stage,pilot,difficulty:this.difficulty,onEvent:events});
+   const Route=stage.mode==='hoverboard'?HoverboardGame:VehicleGame;
+   this.active=new Route({...stats,mission:stage,pilot,difficulty:this.difficulty,onEvent:events});
   }
   this.onEvent('stage',{index,stage});
  }
  switchHero(hero){
+  if(this.active.mode==='hoverboard')return false;
   const p=this.players[0],battle=this.active.mode==='battle';
   if(!Number.isInteger(hero)||!HEROES[hero]||hero===this.hero||this.status!=='playing'||this.switchCooldown>0||p.hp<=0||p.action==='pitfall'||(battle&&(p.z>0||!['idle','walk','guard','land'].includes(p.action)||this.active.call||this.active.tank)))return false;
   const ratio=clamp(p.hp/p.maxHp,0,1);this.hero=hero;p.hero=hero;p.maxHp=HEROES[hero].hp;p.hp=p.maxHp*ratio;
@@ -49,7 +52,7 @@ export class Campaign{
  }
  update(dt,inputs=[]){
   this.switchCooldown=Math.max(0,this.switchCooldown-dt);const input=inputs[0]||{},requested=Number.isInteger(input.targetHero)?input.targetHero:input.switchNextPressed?(this.hero+1)%4:input.switchPrevPressed?(this.hero+3)%4:undefined;
-  if(HEROES[requested])this.pendingHero={hero:requested,time:1.2};
+  if(this.active.mode!=='hoverboard'&&HEROES[requested])this.pendingHero={hero:requested,time:1.2};
   if(this.pendingHero){this.pendingHero.time-=dt;if(this.players[0].hp<=0||this.players[0].action==='pitfall'||this.pendingHero.time<=0||this.switchHero(this.pendingHero.hero))this.pendingHero=null;}
   this.active.update(dt,inputs);
  }

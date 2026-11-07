@@ -71,3 +71,10 @@ New ImageGen sprite sheets contain ready, attack and recoil poses for [Grune, Sa
 - [Captain Shiner’s original episode](https://thundercats.org/cartoons/1985/episodes/sword-in-a-hole/) identifies his ship and crew. The [Skycutter archive](https://thundercats.org/encyclopedia/vehicles/skycutter/) identifies Vultureman as one of its original pilots.
 
 The mission settings, pairings and attack patterns are adaptations for the game. The illustrated boss sheets load when their missions begin.
+
+## Berserker Coast
+
+ImageGen created the [Space Board rider sheet](spaceboard-riders.png), [coastal panorama](berserker-coast.png), and [Hammerhand gunboat sprite](hammerhand-gunboat.png). Each rider has a cruise, tuck, and throwing pose. The coastal chase and gunboat are adaptations for this mission. [Generation prompts](berserker-coast.prompts.json)
+
+- The twins’ faces and costumes follow an [original animation cel](https://thundercats.org/animation-art/community-wilykat-wilykit/) and the [Iron Studios design references](https://thundercats.org/collecting/statues/iron-studios-wilykit-wilykat/).
+- Hammerhand’s appearance follows the [original-series character archive](https://thundercats.org/encyclopedia/characters/hammerhand/). The [original episode](https://thundercats.org/cartoons/1985/episodes/the-terror-of-hammerhand/) inspired the pirate ship encounter.

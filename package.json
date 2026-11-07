@@ -17,7 +17,7 @@
     "test:tank": "node tests/thundertank-check.mjs",
     "test:boss-art": "node tests/boss-art-check.mjs",
     "test:server": "node tests/server-check.mjs",
-    "check": "node --check src/game.js && node --check src/art.js && node --check src/audio.js && node --check src/main.js && node --check src/input.js && node --check src/combat.js && node --check src/campaign.js && node --check src/vehicle.js && node --check src/vehicle-art.js",
+    "check": "node --check src/game.js && node --check src/art.js && node --check src/audio.js && node --check src/main.js && node --check src/input.js && node --check src/combat.js && node --check src/campaign.js && node --check src/vehicle.js && node --check src/vehicle-art.js && node --check src/hoverboard.js && node --check src/hoverboard-art.js",
     "test:vehicles": "node tests/vehicle-playtest.mjs",
     "build:googlesite": "node scripts/build-googlesite.mjs",
     "test:googlesite": "node tests/googlesite-check.mjs"

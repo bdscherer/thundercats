@@ -16,7 +16,7 @@ try{
  await page.addInitScript(()=>{window.__pads=[];Object.defineProperty(navigator,'getGamepads',{value:()=>window.__pads});});
  page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)errors.push(r.status()+' '+r.url());});await fs.mkdir(out,{recursive:true});await page.goto('http://127.0.0.1:'+port);
  await page.waitForFunction(()=>window.thundercats&&Object.values(thundercats.renderer.animations).every(b=>b.ready)&&thundercats.vehicleRenderer.terrain.naturalWidth>0);
- await page.locator('#newGame').click();assert.equal(await page.locator('#missionStart option').count(),18);await page.locator('#begin').click();
+ await page.locator('#newGame').click();assert.equal(await page.locator('#missionStart option').count(),19);await page.locator('#begin').click();
  await page.evaluate(()=>{const g=thundercats.game,p=g.players[0];g.completed=new Set([0,1]);g.banner=0;g.props=[];p.hp=p.maxHp*.6;p.energy=42;});
  const switches=[];
  for(const [key,hero] of [['2',1],['3',2],['q',1],['e',2]]){await page.keyboard.press(key);await page.waitForFunction(hero=>thundercats.campaign.hero===hero,hero);switches.push(hero);await page.waitForTimeout(800);}

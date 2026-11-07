@@ -15,7 +15,7 @@ try{
  await page.screenshot({path:'test-results/single-title.png',fullPage:true});await page.locator('#newGame').click();
  for(const i of [1,3,2])await page.locator(`[data-hero="${i}"]`).click();
  if(await page.locator('.hero-card.selected').count()!==1)throw new Error('Hero selection allowed more than one hero');
- if(await page.locator('#missionStart option').count()!==18)throw new Error('Missing campaign missions');
+ if(await page.locator('#missionStart option').count()!==19)throw new Error('Missing campaign missions');
  await page.screenshot({path:'test-results/single-roster.png',fullPage:true});await page.locator('#begin').click();
  if(await page.evaluate(()=>thundercats.game.players.length!==1||thundercats.game.players[0].hero!==2))throw new Error('Campaign is not single-player');
  await page.keyboard.press('k');await page.waitForTimeout(130);if(await page.evaluate(()=>thundercats.game.players[0].z)<=0)throw new Error('On-foot jump failed');
