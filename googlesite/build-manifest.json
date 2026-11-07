@@ -1,19 +1,19 @@
 {
-  "builtAt": "2026-11-04T19:59:56.156Z",
+  "builtAt": "2026-11-07T02:08:35.580Z",
   "entry": "index.html",
   "standalone": "standalone.html",
-  "standaloneBytes": 63672190,
-  "runtimeAssets": 24,
+  "standaloneBytes": 73299224,
+  "runtimeAssets": 26,
   "files": [
     {
       "path": "index.html",
-      "bytes": 2848,
-      "sha256": "8b6e58b117bc38c809cf15f2c7fccc1c2de782d1782ba0201db985e5898ad0e2"
+      "bytes": 3260,
+      "sha256": "5f6a5157e55bad92ebd5e063975e332bdc09f81a081782226b8e941a6cd6f01d"
     },
     {
       "path": "style.css",
-      "bytes": 11858,
-      "sha256": "dd97e4d6cea71e593b1a13fa38f68df52b4cc1522c2ada07bcd29be4b30e70f4"
+      "bytes": 12543,
+      "sha256": "66e643693a9dddd54ef673127550dd3afb698ad9c418b363fde45ab01eb79b3a"
     },
     {
       "path": "embed.css",
@@ -22,48 +22,48 @@
     },
     {
       "path": "standalone.html",
-      "bytes": 63672190,
-      "sha256": "211edf84ed62e1e59c8ba2d7b59a769f37fd1417550ab124c73c2244e24b23b6"
+      "bytes": 73299224,
+      "sha256": "4c6103664cb4ffebabab843fea4cc8d618451bbf12f4cfd0cb7d6f0e5dd6cb52"
     },
     {
       "path": "src/main.js",
-      "bytes": 17737,
-      "sha256": "8b40d854ab5a6d06ff95f3f20d05629e79f61c311fee51a36e70cc068ca9a4a3"
+      "bytes": 18650,
+      "sha256": "77f6490186df99db707cdb6dc19acb69b4e448ba3de32df1a4b01b39d852c28d"
     },
     {
       "path": "src/campaign.js",
-      "bytes": 3820,
-      "sha256": "aadfe78db3411ac362fffbc1b96858c049524415870f2e6516c3fdd93eec5060"
+      "bytes": 5448,
+      "sha256": "aa7603283b4397e80e1a5daa24cf02804f502800527bde7288e17432e2fbd36d"
     },
     {
       "path": "src/game.js",
-      "bytes": 34450,
-      "sha256": "e62c37f9c8caf438400b42d263ccadce693d4a0c3da19baa59e856b3a681f542"
+      "bytes": 39628,
+      "sha256": "bdba0056abcb98854fd6271d7a7c09212448a763a1b918700f14e644ac3891b7"
     },
     {
       "path": "src/vehicle.js",
-      "bytes": 11705,
-      "sha256": "f135cf0d4c5eef670ea2d22c54a6cf2b4b5a196d2ec9fba7a58b504c38d8a106"
+      "bytes": 14220,
+      "sha256": "544358cc3f20425dc157792c0b803c21126cad4fc067e61c9d8b350ab1e317fd"
     },
     {
       "path": "src/vehicle-art.js",
-      "bytes": 8974,
-      "sha256": "6975bcc1744f51d000669872cd32ab6f7cbc995046187706a2e1706f5a927843"
+      "bytes": 9983,
+      "sha256": "8a23675d4b90b79f896d5800f467496d6d4995c00b3727977c93bc8cb5811478"
     },
     {
       "path": "src/art.js",
-      "bytes": 60538,
-      "sha256": "3c359474a98dfac502ee4aaf84bb89953a382864feb53f29548855c8dcd25d1b"
+      "bytes": 65038,
+      "sha256": "aebef3eb7146ecab2bd3e95f70bd00714a77c3329fdb96bfc3312273bf975eaa"
     },
     {
       "path": "src/audio.js",
-      "bytes": 6476,
-      "sha256": "3fe5c22423de862f37a828f2827b9ee2f4636dd1332eb3a7806ac1613f00b308"
+      "bytes": 6576,
+      "sha256": "72b6ced6dbaa6fca3b3390f62049bf7ca8b37f598e875b3565199ac0019581f5"
     },
     {
       "path": "src/input.js",
-      "bytes": 2408,
-      "sha256": "3b470babeba366e78bd1a6fe9889f96f891d42a303e6ab27d297446fbfb298e9"
+      "bytes": 2789,
+      "sha256": "55537aa54cae81af91a22d80a3ee04a146331e3934f81f43a295b3a6a075f10b"
     },
     {
       "path": "src/combat.js",
@@ -72,8 +72,8 @@
     },
     {
       "path": "src/data.js",
-      "bytes": 11042,
-      "sha256": "26e9bca8642d2b6e053b97cfed937926f73654a1bd21ebfc81a89b12e4ba7e25"
+      "bytes": 15988,
+      "sha256": "6e4f89695097cb494cd58ac554fd7c7073763a36dff2637c5af25c302b8b4e99"
     },
     {
       "path": "assets/thundercats-emblem.png",
@@ -194,6 +194,16 @@
       "path": "assets/vehicle-terrain-topdown-v2.png",
       "bytes": 2312911,
       "sha256": "06469815d7f22c240d4b417883466d691dc76e079cbb284810e5f7bce8599613"
+    },
+    {
+      "path": "assets/expedition-worlds-a.png",
+      "bytes": 3607477,
+      "sha256": "986a822f35465c16d582cb7555cb63979fe06a2bc4335aba0c6177869cdf3991"
+    },
+    {
+      "path": "assets/expedition-worlds-b.png",
+      "bytes": 3595986,
+      "sha256": "d9859e67446e3cd6d7d45a8f059979cd34559fcbc70dcf8915efb5650ec8016e"
     }
   ]
 }

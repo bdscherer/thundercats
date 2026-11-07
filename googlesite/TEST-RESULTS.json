@@ -1,10 +1,10 @@
 {
-  "testedAt": "2026-11-04T20:00:04.512Z",
+  "testedAt": "2026-11-07T02:08:40.780Z",
   "scope": "Local static hosting, cross-origin sandboxed iframe, and opaque-origin standalone iframe; not a published Google Site.",
   "checks": [
     {
       "name": "Subdirectory paths, modules, artwork, MIME types, redirect and private-file protection",
-      "files": 38,
+      "files": 40,
       "passed": true
     },
     {
@@ -28,8 +28,17 @@
       "routes": [
         "thundertank",
         "thunderclaw",
+        "feliner",
+        "thundertank",
+        "thunderclaw",
         "feliner"
       ],
+      "expeditions": [
+        "canopy",
+        "plundarr",
+        "astral-gate"
+      ],
+      "heroSwitching": true,
       "passed": true
     },
     {
@@ -53,8 +62,17 @@
       "routes": [
         "thundertank",
         "thunderclaw",
+        "feliner",
+        "thundertank",
+        "thunderclaw",
         "feliner"
       ],
+      "expeditions": [
+        "canopy",
+        "plundarr",
+        "astral-gate"
+      ],
+      "heroSwitching": true,
       "externalRequests": 1,
       "passed": true
     }

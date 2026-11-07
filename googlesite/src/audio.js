@@ -32,6 +32,7 @@ export class AudioEngine {
   case 'clear':case 'bossDefeated':case 'victory':[0,4,7,12,7,12].forEach((n,i)=>this.fm(261.63*2**(n/12),.38,.14,t+i*.12));break;
   case 'empty':this.note(75,.1,'square',.04);break;
   case 'ui':this.note(500,.05,'triangle',.09);break;
+  case 'heroSwitch':this.note(330,.08,'triangle',.07,t);this.note(660,.12,'sine',.06,t+.055);break;
   case 'gameover':[0,-3,-7,-12].forEach((n,i)=>this.fm(220*2**(n/12),.5,.12,t+i*.25));break;
  }}
  update(active,stage=0,boss=false){if(!this.ctx)return;if(!active||!this.music){this.next=this.ctx.currentTime;return;}const track=['forest','ruins','desert','pyramid','lair'].indexOf(STAGES[stage]?.theme);const t=this.ctx.currentTime;if(this.next<t-.5)this.next=t+.02;const bpm=boss?144:track===2?126:track===4?124:116;const duration=60/bpm/4;let scheduled=0;while(this.next<t+.15&&scheduled++<8){this.sequence(this.step++,this.next,duration,track,boss);this.next+=duration;}}

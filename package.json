@@ -13,6 +13,7 @@
     "test:pits": "node tests/pit-animation-check.mjs",
     "test:world": "node tests/world-check.mjs",
     "test:backgrounds": "node tests/background-transition-check.mjs",
+    "test:expansion": "node tests/expansion-browser-check.mjs",
     "test:tank": "node tests/thundertank-check.mjs",
     "test:boss-art": "node tests/boss-art-check.mjs",
     "test:server": "node tests/server-check.mjs",

@@ -8,7 +8,7 @@ const assetNames=[
  'thundercats-emblem.png','heroes-hd.png','heroes-run.png','lion-o-run-v2.png','heroes-combo.png','heroes-actions.png','villains-hd.png','villains-run.png','supports-1985.png','enemy-specialists.png','world-landmarks.png','thundertank-1985.png',
  ...['slythe','monkian','jackalman','mummra'].map(n=>'boss-'+n+'-1985.png'),
  ...['lair','forest','ruins','desert','pyramid'].map(n=>n+'-hd.png'),
- 'vehicle-heroes-topdown.png','vehicle-enemies-topdown.png','vehicle-terrain-topdown-v2.png'
+ 'vehicle-heroes-topdown.png','vehicle-enemies-topdown.png','vehicle-terrain-topdown-v2.png','expedition-worlds-a.png','expedition-worlds-b.png'
 ];
 await fs.mkdir(path.join(out,'src'),{recursive:true});await fs.mkdir(path.join(out,'assets'),{recursive:true});
 for(const name of sourceNames)await fs.copyFile(path.join(root,'src',name),path.join(out,'src',name));
@@ -21,7 +21,7 @@ html,body{margin:0;min-height:0;background:#091011}#app{width:100%;max-width:non
 `;
 await fs.writeFile(path.join(out,'style.css'),css);await fs.writeFile(path.join(out,'embed.css'),embedCss);
 let index=await fs.readFile(path.join(root,'index.html'),'utf8');
-index=index.replace('A local four-player arcade beat \'em up.','A single-player arcade adventure with eight combat and vehicle missions.').replace('<link rel="stylesheet" href="style.css" />','<link rel="stylesheet" href="style.css" />\n  <link rel="stylesheet" href="embed.css" />').replace('id="screen"','id="screen" tabindex="0"');
+index=index.replace('A local four-player arcade beat \'em up.','A single-player arcade adventure with eighteen combat and vehicle missions.').replace('<link rel="stylesheet" href="style.css" />','<link rel="stylesheet" href="style.css" />\n  <link rel="stylesheet" href="embed.css" />').replace('id="screen"','id="screen" tabindex="0"');
 await fs.writeFile(path.join(out,'index.html'),index);
 const assets={};for(const name of assetNames)assets['assets/'+name]='data:image/png;base64,'+(await fs.readFile(path.join(root,'assets',name))).toString('base64');
 const modules=[];

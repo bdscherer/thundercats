@@ -1,6 +1,6 @@
-import {VehicleGame,VEHICLE_MISSIONS} from '../src/vehicle.js';
+import {VehicleGame,VEHICLE_MISSIONS,EXTRA_VEHICLE_MISSIONS} from '../src/vehicle.js';
 const results=[];
-for(const mission of VEHICLE_MISSIONS){
+for(const mission of [...VEHICLE_MISSIONS,...EXTRA_VEHICLE_MISSIONS]){
  const g=new VehicleGame({mission});let ticks=0;
  while(g.status==='playing'&&ticks++<60*240){
   const p=g.ship,boss=g.enemies.find(e=>e.boss),foes=g.enemies.filter(e=>e.y>60&&e.y<p.y-70),repair=g.pickups.find(q=>q.type==='repair'&&p.hp<p.maxHp*.8&&q.y>100&&q.y<450);

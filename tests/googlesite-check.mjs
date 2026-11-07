@@ -29,7 +29,7 @@ try{
  });
  await new Promise(resolve=>parent.listen(0,'127.0.0.1',resolve));const parentBase='http://localhost:'+parent.address().port;
  const cache=path.join(homedir(),'AppData','Local','ms-playwright'),exe=existsSync(cache)?readdirSync(cache).filter(n=>/^chromium-/.test(n)).map(n=>path.join(cache,n,'chrome-win','chrome.exe')).find(existsSync):undefined;
- browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||exe});
+ browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH||exe||(existsSync("C:/Program Files/Google/Chrome/Application/chrome.exe")?"C:/Program Files/Google/Chrome/Application/chrome.exe":undefined)});
  await fs.mkdir(path.join(root,'test-results'),{recursive:true});
  for(const standalone of [false,true]){
   const context=await browser.newContext({viewport:{width:1200,height:850}}),page=await context.newPage(),errors=[],requests=[];
@@ -44,7 +44,8 @@ try{
   assert.equal(await frame.evaluate(()=>getComputedStyle(document.documentElement).color),'rgb(239, 233, 213)','Exported theme failed to apply');
   const restrictions=await frame.evaluate(()=>{let gamepadBlocked=false,storageBlocked=false;try{navigator.getGamepads();}catch{gamepadBlocked=true;}try{localStorage.getItem('tc-save');}catch{storageBlocked=true;}return {gamepadBlocked,storageBlocked};});
   assert.equal(restrictions.gamepadBlocked,true);if(standalone)assert.equal(restrictions.storageBlocked,true);
-  await frame.locator('#newGame').click();await frame.locator('[data-hero="0"]').click();await frame.locator('#begin').click();
+  await frame.locator('#newGame').click();assert.equal(await frame.locator('#missionStart option').count(),18);await frame.locator('[data-hero="0"]').click();await frame.locator('#begin').click();
+  await page.keyboard.press('3');await frame.waitForFunction(()=>thundercats.campaign.hero===2);await page.waitForTimeout(800);await page.keyboard.press('1');await frame.waitForFunction(()=>thundercats.campaign.hero===0);
   const before=await frame.evaluate(()=>thundercats.game.players[0].x);
   await page.keyboard.down('ArrowRight');await page.waitForTimeout(350);await page.keyboard.up('ArrowRight');
   const after=await frame.evaluate(()=>({x:thundercats.game.players[0].x,focus:document.hasFocus(),active:document.activeElement?.id,view:thundercats.view}));
@@ -54,7 +55,7 @@ try{
   assert.equal(pitReturn.fell,true);assert.equal(pitReturn.damage,pitReturn.expected);assert.equal(pitReturn.blink,1);assert.equal(pitReturn.protection,1);
   await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
   const routes=[];
-  for(const [mission,vehicle] of [[1,'thundertank'],[3,'thunderclaw'],[6,'feliner']]){
+  for(const [mission,vehicle] of [[1,'thundertank'],[3,'thunderclaw'],[6,'feliner'],[9,'thundertank'],[12,'thunderclaw'],[15,'feliner']]){
    await frame.selectOption('#missionStart',String(mission));await frame.locator('#begin').click();
    await frame.waitForFunction(()=>thundercats.game.mode==='vehicle');await frame.evaluate(()=>{const g=thundercats.game;g.banner=0;g.ship.invuln=99;g.spawn(g.spec.ground?'nosediver':'skycutter',g.ship.x,g.ship.y-170);});
    const scroll=await frame.evaluate(()=>thundercats.game.scroll);await page.keyboard.down('Space');await page.waitForTimeout(1000);await page.keyboard.up('Space');
@@ -63,9 +64,15 @@ try{
    if(!standalone)await page.screenshot({path:path.join(root,'test-results','googlesite-'+vehicle+'.png')});
    await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
   }
+  const expeditions=[];for(const [mission,id] of [[7,'canopy'],[13,'plundarr'],[16,'astral-gate']]){
+   await frame.selectOption('#missionStart',String(mission));await frame.locator('#begin').click();await frame.waitForFunction(id=>thundercats.campaign.stage.id===id,id);
+   await frame.waitForFunction(()=>thundercats.renderer.expeditionAtlases?.filter(Boolean).every(img=>img.complete&&img.naturalWidth>0),{},{timeout:120000});
+   const bosses=await frame.evaluate(()=>{const g=thundercats.game;g.beginEncounter(g.bossEncounter);return g.enemies.filter(e=>e.boss).length;});assert.equal(bosses,id==='canopy'?1:2);expeditions.push(id);
+   await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
+  }
   if(!standalone){await page.setViewportSize({width:740,height:720});await page.screenshot({path:path.join(root,'test-results','googlesite-mobile.png')});const fit=await frame.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1);assert.equal(fit,true,'Horizontal overflow inside iframe');}
   if(standalone)assert.ok(requests.every(url=>url===base+'/googlesite/standalone.html'),'Standalone loaded external files: '+requests.map(s=>s.slice(0,140)).join(', '));
-  assert.deepEqual(errors,[]);report.checks.push({name:standalone?'Standalone HTML in opaque sandbox, no storage or gamepad permission':'Hosted subdirectory in cross-origin sandbox with gamepad denied',restrictions,backgroundTransition,pitReturn,routes,externalRequests:standalone?requests.length:undefined,passed:true});
+  assert.deepEqual(errors,[]);report.checks.push({name:standalone?'Standalone HTML in opaque sandbox, no storage or gamepad permission':'Hosted subdirectory in cross-origin sandbox with gamepad denied',restrictions,backgroundTransition,pitReturn,routes,expeditions,heroSwitching:true,externalRequests:standalone?requests.length:undefined,passed:true});
   await context.close();
  }
  report.passed=true;await fs.writeFile(path.join(out,'TEST-RESULTS.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

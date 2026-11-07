@@ -54,3 +54,9 @@ The current visual brief: **Castle Crashers-inspired smooth hand-drawn cartoon r
 - [Jackalman](https://thundercats.org/encyclopedia/characters/jackalman/)
 
 This is an unofficial playable fan project with newly generated interpretations of the original-series designs.
+
+## Eighteen-mission expansion
+
+`expedition-worlds-a.png` and `expedition-worlds-b.png` were created with the built-in image-generation tool, using `forest-hd.png` only as a reference for the established inked cartoon style. Each is a borderless 2×2 landscape atlas. A contains canopy bridges, frozen pass, volcanic mountain and swamp; B contains Plun-Darr fortress, industrial foundry, astral gate and a reserved coastal scene. The renderer crops each cell with an inset to avoid sampling adjacent scenes, overlaps scrolling tiles with feathered edges, and fades the newly loaded art in. The two atlases load on demand in the normal hosted version.
+
+Full prompts: [expedition-worlds.prompts.json](expedition-worlds.prompts.json). Final assets: [atlas A](expedition-worlds-a.png), [atlas B](expedition-worlds-b.png). Snow, embers, fog, conveyor belts, hazard warnings and phase effects are canvas graphics layered over the illustrated environments.

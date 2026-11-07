@@ -19,12 +19,13 @@ function battleInput(g){
  const groundDanger=g.zones.find(z=>!z.detonated&&Math.hypot(p.x-z.x,(p.y-z.y)*1.5)<z.r+12&&z.delay-z.elapsed<.35)||g.traps.find(t=>t.warning&&Math.hypot(p.x-t.x,(p.y-t.y)*1.5)<t.r+12);
  if(groundDanger&&p.z<1){input.jumpPressed=true;if(p.dodgeCd<=0){input.dodgePressed=true;input.moveY=p.y>groundDanger.y?1:-1;}}return input;
 }
-function play(hero){
+function play(hero,switching=false){
  const reached=[],g=new Campaign({hero,onEvent:(type,data)=>{if(type==='stage')reached.push(data.stage.id);}});let ticks=0;
- while(ticks++<60*2400&&g.status!=='victory'&&g.status!=='gameover'){
+ let switches=0,lastSwitch=0;while(ticks++<60*3600&&g.status!=='victory'&&g.status!=='gameover'){
   if(g.status==='stageclear'){g.nextStage();continue;}
+  if(switching&&g.time-lastSwitch>15&&g.switchHero((g.hero+1)%4)){switches++;lastSwitch=g.time;}
   g.update(1/60,[g.active.mode==='vehicle'?vehicleInput(g.active):battleInput(g.active)]);
  }
- return {hero:HEROES[hero].name,status:g.status,reached,seconds:Math.round(g.time),kills:g.kills,score:g.score,hp:Math.round(g.players[0].hp),continues:g.players[0].lives,...(g.status!=='victory'?{mission:g.stage.id,gate:g.active.gate,x:g.players[0].x,y:g.players[0].y,enemies:g.enemies.map(e=>({type:e.type,x:e.x,y:e.y,hp:e.hp}))}:{})};
+ return {hero:HEROES[hero].name,switches,status:g.status,reached,seconds:Math.round(g.time),kills:g.kills,score:g.score,hp:Math.round(g.players[0].hp),continues:g.players[0].lives,...(g.status!=='victory'?{mission:g.stage.id,gate:g.active.gate,x:g.players[0].x,y:g.players[0].y,enemies:g.enemies.map(e=>({type:e.type,x:e.x,y:e.y,hp:e.hp}))}:{})};
 }
-const results=process.argv[2]?[play(Number(process.argv[2]))]:[play(0),play(2)];console.log(JSON.stringify(results,null,2));if(results.some(r=>r.status!=='victory'))process.exitCode=1;
+const arg=process.argv.slice(2).find(a=>/^\d$/.test(a)),switching=process.argv.includes('--switch');const results=arg!==undefined?[play(Number(arg),switching)]:[play(0,switching),play(2,switching)];console.log(JSON.stringify(results,null,2));if(results.some(r=>r.status!=='victory'))process.exitCode=1;

@@ -15,7 +15,7 @@ try{
  await page.screenshot({path:'test-results/single-title.png',fullPage:true});await page.locator('#newGame').click();
  for(const i of [1,3,2])await page.locator(`[data-hero="${i}"]`).click();
  if(await page.locator('.hero-card.selected').count()!==1)throw new Error('Hero selection allowed more than one hero');
- if(await page.locator('#missionStart option').count()!==8)throw new Error('Missing campaign missions');
+ if(await page.locator('#missionStart option').count()!==18)throw new Error('Missing campaign missions');
  await page.screenshot({path:'test-results/single-roster.png',fullPage:true});await page.locator('#begin').click();
  if(await page.evaluate(()=>thundercats.game.players.length!==1||thundercats.game.players[0].hero!==2))throw new Error('Campaign is not single-player');
  await page.keyboard.press('k');await page.waitForTimeout(130);if(await page.evaluate(()=>thundercats.game.players[0].z)<=0)throw new Error('On-foot jump failed');
@@ -23,7 +23,7 @@ try{
  if(!await page.evaluate(()=>!!thundercats.game.tank))throw new Error('Panthro lost the tank special');
  await page.screenshot({path:'test-results/single-panthro-tank.png',fullPage:true});
  const missions=[];
- for(const [index,vehicle,next] of [[1,'thundertank','forest'],[3,'thunderclaw','ruins'],[6,'feliner','pyramid']]){
+ for(const [index,vehicle,next] of [[1,'thundertank','forest'],[3,'thunderclaw','ruins'],[6,'feliner','canopy']]){
   await page.keyboard.press('Escape');await page.locator('#quit').click();await page.locator('#newGame').click();await page.selectOption('#missionStart',String(index));await page.locator('#begin').click();
   await page.waitForFunction(()=>thundercats.game.mode==='vehicle');await page.waitForTimeout(600);
   const before=await page.evaluate(()=>({x:thundercats.game.ship.x,scroll:thundercats.game.scroll}));
@@ -42,7 +42,7 @@ try{
   await page.screenshot({path:`test-results/vehicle-${vehicle}-boss.png`,fullPage:true});
   await page.evaluate(()=>{const g=thundercats.game,boss=g.enemies.find(e=>e.boss);g.hitEnemy(boss,boss.hp,false);});await page.waitForFunction(()=>thundercats.view==='stageclear');
   const save=await page.evaluate(()=>JSON.parse(localStorage.getItem('tc-save')));if(save.missionId!==next||save.hero!==2)throw new Error('Vehicle checkpoint failed: '+JSON.stringify(save));
-  await page.locator('#nextStage').click();if(await page.evaluate(()=>thundercats.game.stage.theme)!==next)throw new Error('Vehicle-to-battle transition failed');
+  await page.locator('#nextStage').click();if(await page.evaluate(()=>thundercats.campaign.stage.id)!==next)throw new Error('Vehicle-to-battle transition failed');
   missions.push({vehicle,steering:Math.round(moving.x-before.x),scroll:Math.round(moving.scroll-before.scroll),fire,next});
  }
  await page.keyboard.press('Escape');await page.locator('#quit').click();await page.evaluate(()=>localStorage.setItem('tc-save',JSON.stringify({version:2,stageId:'forest',heroes:[3,1,2,0],players:[{hp:100,lives:2,energy:44}],score:1230,difficulty:'normal'})));await page.reload();await page.locator('#continueGame').click();

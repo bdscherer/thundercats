@@ -24,6 +24,7 @@ export class Controls{
    for(const [action,button]of Object.entries(BUTTONS)){const padHeld=pressed(button);padState[action]=padHeld;input[action]=held(action)||padHeld;input[action+'Pressed']=edge(action)||(padHeld&&!this.previousPads[i]?.[action]);}
    // A down/up pair between two simulation frames must still register exactly once.
    input.attackHeld=input.attack;if(input.attackPressed)input.attack=true;
+   if(single){input.switchNextPressed=this.keyEdges.has('KeyE')||this.keyEdges.has('Tab')||this.touchEdges.has('switchNext')||(pressed(5)&&!this.previousPads[i]?.switchNext);input.switchPrevPressed=this.keyEdges.has('KeyQ');padState.switchNext=pressed(5);for(let hero=0;hero<4;hero++)if(this.keyEdges.has('Digit'+(hero+1))||this.touchEdges.has('hero'+hero))input.targetHero=hero;}
    this.previousPads[i]=padState;result.push(input);
   }
   this.keyEdges.clear();this.touchEdges.clear();this.previousPads.length=count;return result;

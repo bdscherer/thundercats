@@ -11,6 +11,11 @@ export const VEHICLE_MISSIONS=[
  {id:'claw-flight',name:'THUNDERCLAW · SKY CHASE',tag:'Take back the skies',vehicle:'thunderclaw',terrain:1,length:11800,scrollSpeed:175,boss:'SKYCUTTER COMMANDER',bossType:'skycutter',sections:['FOREST CANOPY','STORM PASS','SKYCUTTER SQUADRON'],story:'Pilot the ThunderClaw above Third Earth. Weave through cliffs and clouds, then defeat the Skycutter squadron.'},
  {id:'feliner-flight',name:'FELINER · ORBITAL ASSAULT',tag:'Intercept the Ratstar',vehicle:'feliner',terrain:2,length:13500,scrollSpeed:195,boss:'RATAR-O’S RATSTAR',bossType:'ratstar',sections:['LOW ORBIT','ASTEROID BELT','RATSTAR INTERCEPT'],story:'Launch the Feliner into orbit. Cross the asteroid belt and stop Ratar-O’s Ratstar before returning to the Black Pyramid.'}
 ].map(s=>({...s,mode:'vehicle',theme:s.id}));
+export const EXTRA_VEHICLE_MISSIONS=[
+ {...VEHICLE_MISSIONS[0],id:'tank-ice',theme:'tank-ice',name:'THUNDERTANK · GLACIER RUN',tag:'Break the frozen blockade',length:12500,scrollSpeed:165,environment:'ice',bossTier:2,sections:['FROZEN CANYON','ICE MINEFIELDS','ARMORED FISTPOUNDER'],story:'Drive the original Thundertank across a glacier road. Ice slows steering recovery, and an upgraded Fistpounder lays mines during its cannon volleys.'},
+ {...VEHICLE_MISSIONS[1],id:'claw-tempest',theme:'claw-tempest',name:'THUNDERCLAW · TEMPEST STRIKE',tag:'Fly into the thunderstorm',length:13800,scrollSpeed:195,environment:'storm',bossTier:2,sections:['RAIN FRONT','LIGHTNING CORRIDOR','SKYCUTTER CROSSFIRE'],story:'Pilot the ThunderClaw through crosswinds and marked lightning strikes. The commander mixes aimed fans and rotating fire.'},
+ {...VEHICLE_MISSIONS[2],id:'feliner-deep',theme:'feliner-deep',name:'FELINER · DEEP SPACE',tag:'Pursue Ratar-O',length:15000,scrollSpeed:215,environment:'nebula',bossTier:3,sections:['THE VIOLET NEBULA','DEBRIS GAUNTLET','RATSTAR DREADNOUGHT'],story:'Take the Feliner into a violet nebula. Thread dense debris and defeat the Ratstar’s three-phase orbital barrage.'}
+];
 const ENEMY={skycutter:{row:0,hp:66,width:73,height:88,speed:100,fire:2.1},nosediver:{row:1,hp:105,width:82,height:114,speed:86,fire:2.7},fistpounder:{row:2,hp:1800,width:220,height:205,speed:40,fire:.95},ratstar:{row:3,hp:2300,width:295,height:210,speed:30,fire:.85}};
 let id=0;
 export class VehicleGame{
@@ -18,12 +23,12 @@ export class VehicleGame{
   this.mode='vehicle';this.stage=mission;this.spec=VEHICLES[mission.vehicle];this.rules=DIFFICULTIES[difficulty]||DIFFICULTIES.normal;this.difficulty=difficulty;this.onEvent=onEvent;this.random=seeded(seed);this.players=[{hero:0,hp:HEROES[0].hp,maxHp:HEROES[0].hp,lives:this.rules.lives,energy:0,kills:0,score:0,...pilot,slot:0}];this.status='playing';
   this.score=score;this.kills=kills;this.time=time;this.bestCombo=bestCombo;this.combo=0;this.comboTimer=0;this.stageTime=0;this.distance=0;this.prevDistance=0;this.scroll=0;this.prevScroll=0;this.tracks=[];this.trackClock=0;this.sectionIndex=0;this.banner=4;this.shake=0;
   this.ship={x:480,y:410,prevX:480,prevY:410,vx:0,vy:0,hp:this.spec.hull,maxHp:this.spec.hull,energy:0,invuln:2.5,fireCd:0,boost:0,boostCd:0,flash:0,tilt:0};
-  this.enemies=[];this.shots=[];this.projectiles=[];this.obstacles=[];this.pickups=[];this.particles=[];this.texts=[];this.nextWave=350;this.nextHazard=1000;this.nextRepair=2100;this.bossStarted=false;this.bossDefeated=false;this.exitTime=0;this.wave=0;
+  this.enemies=[];this.shots=[];this.projectiles=[];this.obstacles=[];this.pickups=[];this.particles=[];this.texts=[];this.hazards=[];this.hazardClock=4;this.nextWave=350;this.nextHazard=1000;this.nextRepair=2100;this.bossStarted=false;this.bossDefeated=false;this.exitTime=0;this.wave=0;
  }
  emit(type,data={}){this.onEvent(type,data);}
  clearInput(){}
  burst(x,y,color,count=12){for(let i=0;i<count;i++)this.particles.push({x,y,vx:(this.random()-.5)*190,vy:(this.random()-.5)*190,life:.3+this.random()*.3,color,size:2+this.random()*4});}
- spawn(type,x,y=-90,boss=false){const s=ENEMY[type];const e={id:id++,type,row:s.row,x,y,prevX:x,prevY:y,baseX:x,age:0,width:boss?s.width* (type==='skycutter'?2.1:1):s.width,height:boss?s.height*(type==='skycutter'?1.8:1):s.height,hp:(boss&&type==='skycutter'?1500:s.hp)*this.rules.health,maxHp:0,boss,fireCd:boss?1.6:1.5+this.random(),flash:0,phase:0,shot:false};e.maxHp=e.hp;this.enemies.push(e);return e;}
+ spawn(type,x,y=-90,boss=false){const s=ENEMY[type],tier=this.stage.bossTier||1;const e={id:id++,type,row:s.row,x,y,prevX:x,prevY:y,baseX:x,age:0,width:boss?s.width* (type==='skycutter'?2.1:1)*(1+tier*.06):s.width,height:boss?s.height*(type==='skycutter'?1.8:1)*(1+tier*.06):s.height,hp:(boss&&type==='skycutter'?1500:s.hp)*this.rules.health*(boss?1.15+tier*.12:1),maxHp:0,boss,fireCd:boss?1.6:1.5+this.random(),flash:0,phase:0,shot:false,pattern:0};e.maxHp=e.hp;this.enemies.push(e);return e;}
  spawnFormation(){
   const type=this.stage.vehicle==='thundertank'?'nosediver':'skycutter',count=3+Math.min(2,this.sectionIndex),pattern=this.wave++%4;
   for(let i=0;i<count;i++){
@@ -56,8 +61,9 @@ export class VehicleGame{
   if(p.hp<=0){const pilot=this.players[0];if(pilot.lives>0){pilot.lives--;p.hp=p.maxHp;p.invuln=3;p.boost=0;this.projectiles=[];this.emit('vehicleContinue');}else{pilot.hp=0;this.status='gameover';this.emit('gameover');}}return true;
  }
  enemyFire(e){
-  const boss=e.boss,count=boss?(e.hp<e.maxHp*.5?7:5):1,p=this.ship,angle=Math.atan2(p.y-e.y,p.x-e.x);
-  for(let i=0;i<count;i++){const a=angle+(i-(count-1)/2)*(boss?.23:0),speed=boss?170:155;this.projectiles.push({x:e.x,y:e.y+e.height*.3,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:boss?6:5,power:boss?22:15,life:5});}
+  const boss=e.boss,p=this.ship,phase=e.phase||0,pattern=boss?e.pattern++%3:0,count=boss?5+phase*2:1,angle=Math.atan2(p.y-e.y,p.x-e.x);
+  for(let i=0;i<count;i++){const a=pattern===1?Math.PI*.15+i*Math.PI*.7/(count-1):pattern===2?Math.PI*.5+(i-(count-1)/2)*.18+Math.sin(e.age)*.3:angle+(i-(count-1)/2)*(boss?.2:0),speed=boss?155+phase*15:155;this.projectiles.push({x:e.x,y:e.y+e.height*.3,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:boss?6:5,power:boss?22:15,life:5});}
+  if(boss&&phase>0&&pattern===2){if(e.type==='fistpounder')for(const x of [180,780])this.obstacles.push({x,y:e.y+70,r:24,hp:60,type:'mine',seed:e.age});else if(this.enemies.length<8)this.spawn('skycutter',e.x<480?780:180,-80);}
   e.shot=true;e.flash=Math.max(e.flash,.05);
  }
  update(dt,inputs=[]){
@@ -65,7 +71,9 @@ export class VehicleGame{
   p.prevX=p.x;p.prevY=p.y;this.prevDistance=this.distance;for(const key of ['fireCd','boost','boostCd','flash','invuln'])p[key]=Math.max(0,p[key]-dt);
   if((input.jumpPressed||input.dodgePressed)&&p.boostCd<=0){p.boost=.65;p.boostCd=2.4;p.invuln=Math.max(p.invuln,.48);this.emit('dodge');}
   const mx=input.moveX??Number(!!input.right)-Number(!!input.left),my=input.moveY??Number(!!input.down)-Number(!!input.up),length=Math.max(1,Math.hypot(mx,my)),speed=s.speed*(p.boost>0?1.65:1);
-  p.vx=approach(p.vx,mx/length*speed,2200*dt);p.vy=approach(p.vy,my/length*speed,2200*dt);p.x=clamp(p.x+p.vx*dt,70+s.width*.22,890-s.width*.22);p.y=clamp(p.y+p.vy*dt,145,470);p.tilt=approach(p.tilt,p.vx/s.speed,6*dt);
+  const grip=this.stage.environment==='ice'&&Math.hypot(mx,my)<.03?500:2200;p.vx=approach(p.vx,mx/length*speed,grip*dt);p.vy=approach(p.vy,my/length*speed,grip*dt);const wind=this.stage.environment==='storm'?Math.sin(this.stageTime*.8)*30:0;p.x=clamp(p.x+(p.vx+wind)*dt,70+s.width*.22,890-s.width*.22);p.y=clamp(p.y+p.vy*dt,145,470);p.tilt=approach(p.tilt,p.vx/s.speed,6*dt);
+  this.hazardClock-=dt;if(this.stage.environment==='storm'&&this.hazardClock<=0){this.hazardClock=5;this.hazards.push({x:p.x,y:p.y,r:70,elapsed:0,delay:1.4,life:1.75,hit:false});}
+  for(const h of this.hazards){h.elapsed+=dt;h.life-=dt;if(!h.hit&&h.elapsed>=h.delay){h.hit=true;if(Math.hypot(h.x-p.x,h.y-p.y)<h.r)this.damage(24);this.burst(h.x,h.y,'#a9edff',20);}}this.hazards=this.hazards.filter(h=>h.life>0);
   if(input.attack||input.attackPressed)this.shoot();if(input.specialPressed)this.special();
   const scroll=this.bossStarted&&!this.bossDefeated?this.stage.scrollSpeed*.3:this.stage.scrollSpeed*(p.boost>0?1.25:1);
   this.prevScroll=this.scroll;this.scroll+=scroll*dt;this.trackClock+=scroll*dt;
@@ -77,10 +85,10 @@ export class VehicleGame{
   if(!this.bossStarted&&this.distance>=this.nextRepair){this.pickups.push({x:230+this.random()*500,y:-20,type:'repair'});this.nextRepair+=2100;}
   if(!this.bossStarted&&this.distance>=this.stage.length-900){this.bossStarted=true;this.spawn(this.stage.bossType,480,-150,true);this.texts.push({text:this.stage.boss,life:2.5});this.emit('encounter',{boss:true});}
   for(const e of this.enemies){e.prevX=e.x;e.prevY=e.y;e.age+=dt;e.flash=Math.max(0,e.flash-dt);e.fireCd-=dt;
-   if(e.boss){e.y=approach(e.y,155,95*dt);e.x=480+Math.sin(e.age*.7)*235;}
+   if(e.boss){const phase=e.hp<e.maxHp*.25?2:e.hp<e.maxHp*.62?1:0;if(phase>e.phase){e.phase=phase;e.fireCd=Math.max(e.fireCd,.9);this.texts.push({text:'BOSS PHASE '+(phase+1),life:1.5});}e.y=approach(e.y,155+Math.sin(e.age*.9)*phase*16,95*dt);e.x=480+Math.sin(e.age*(.7+phase*.13))*235;}
    else{e.y+=(ENEMY[e.type].speed+scroll*.32)*dt;e.x=clamp(e.baseX+Math.sin(e.age*1.7+e.id)*55,60,900);}
    if(e.hp>0&&e.y>40&&e.y<410&&e.fireCd<.5&&e.fireCd>0)e.warning=true;else e.warning=false;
-   if(e.hp>0&&e.y>45&&e.y<420&&e.fireCd<=0){this.enemyFire(e);e.fireCd=ENEMY[e.type].fire/(this.difficulty==='hard'?1.25:1);}
+   if(e.hp>0&&e.y>45&&e.y<420&&e.fireCd<=0){this.enemyFire(e);e.fireCd=(e.boss?1.3-e.phase*.18:ENEMY[e.type].fire)/(this.difficulty==='hard'?1.25:1);}
    if(e.hp>0&&Math.abs(e.x-p.x)<(e.boss?65:35)&&Math.abs(e.y-p.y)<(e.boss?65:42))this.damage(e.boss?35:24);
   }
   for(const shot of this.shots){shot.prevY=shot.y;shot.y+=shot.vy*dt;shot.life-=dt;
