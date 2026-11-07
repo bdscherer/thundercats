@@ -37,7 +37,7 @@ Open `http://localhost:4173/googlesite/embed-preview.html` to test the iframe, o
 
 [TEST-RESULTS.json](TEST-RESULTS.json) records the successful local checks:
 
-- All 53 exported runtime files served correctly beneath `/googlesite/`, with JavaScript MIME types and a trailing-slash redirect.
+- All 54 exported runtime files served correctly beneath `/googlesite/`, with JavaScript MIME types and a trailing-slash redirect.
 - Private project files remained inaccessible through the preview server.
 - The hosted version played in a cross-origin sandboxed iframe with gamepad access explicitly denied.
 - The standalone version played in an opaque-origin sandbox with gamepad access and local storage unavailable, fetching only its HTML document.

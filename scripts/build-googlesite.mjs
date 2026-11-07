@@ -3,7 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createHash} from 'node:crypto';
 const root=fileURLToPath(new URL('../',import.meta.url)),out=path.join(root,'googlesite');
-const sourceNames=['main','campaign','game','vehicle','vehicle-art','hoverboard','hoverboard-art','art','audio','input','combat','data','bosses'].map(n=>n+'.js');
+const sourceNames=['main','campaign','game','vehicle','vehicle-art','hoverboard','hoverboard-art','art','audio','input','gamepad-menu','combat','data','bosses'].map(n=>n+'.js');
 const assetNames=[
  'thundercats-emblem.png','heroes-hd.png','heroes-run.png','lion-o-run-v2.png','heroes-combo.png','heroes-actions.png','villains-hd.png','villains-run.png','supports-1985.png','enemy-specialists.png','world-landmarks.png','thundertank-1985.png',
  ...['slythe','monkian','jackalman','mummra'].map(n=>'boss-'+n+'-1985.png'),

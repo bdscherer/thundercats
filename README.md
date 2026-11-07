@@ -76,6 +76,8 @@ Bosses have dedicated 12-pose sheets based on original cartoon references. Nearb
 
 Any connected standard gamepad can control the single hero, including one assigned a nonzero browser index. Keyboard, touch and gamepad inputs can be mixed. Touch buttons change to FIRE and BOOST in vehicle missions. Vehicle boost has a 2.4-second cooldown and brief collision protection. Hold fire and keep moving.
 
+In menus, use the D-pad or left stick to move, **A / Cross** to select, and **B / Circle** to go back. Select a field such as Mission, Difficulty, or Volume to edit it with the D-pad or stick, then press **A / Cross** to apply or **B / Circle** to cancel.
+
 On foot, chain three-hit attacks, jump over ground hazards, block toward attackers and use directional dodges. Regular hits give 3% special charge, finishers 4%, and power crystals 12%. There is no passive charging. Specials consume the full meter.
 
 | Hero | Weapons | Special |

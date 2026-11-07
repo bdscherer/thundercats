@@ -18,6 +18,10 @@ canvas,.hero-card canvas{image-rendering:auto}.hero-card canvas{height:122px}.ti
 @media(max-width:800px){.hero-card canvas{height:68px}}
 .lobby-bottom{flex-wrap:wrap;gap:12px}.lobby-bottom .field:first-child{flex:1 1 280px;min-width:0;max-width:48%}.lobby-bottom .field select{max-width:100%;text-overflow:ellipsis}.lobby-bottom .primary{flex:0 0 auto}@media(max-width:800px){.lobby-bottom .field:first-child{max-width:100%;flex-basis:100%}.lobby-bottom .primary{flex:1}}
 .hero-switch{position:absolute;z-index:3;top:23%;left:2.3%;display:flex;align-items:center;gap:4px;font:700 clamp(6px,.75vw,10px) system-ui;color:#c9d7cf}.hero-switch[hidden]{display:none}.hero-switch button{font:inherit;padding:5px 7px;min-height:26px;color:#d6e2d8;background:#102632dc;border:1px solid #50636b;border-radius:3px;touch-action:none;cursor:pointer}.hero-switch button[aria-pressed=true]{border-color:#efd28c;color:#ffe7a6;background:#3b493ee8}.hero-switch button:focus-visible{outline:2px solid #f6e0a1;outline-offset:2px}@media(max-width:600px){.hero-switch{top:23%;gap:2px;font-size:6px}.hero-switch>span{display:none}.hero-switch button{padding:4px;min-height:25px}}
+
+/* Controller focus stays visible even after a mouse click. */
+.overlay [data-pad-focus]{outline:3px solid #ffdc8e;outline-offset:2px;scroll-margin:6px}
+.overlay [data-pad-edit]{outline:3px dashed #9bedeb}
 </style>
   <style>/* Compact frame layout for Google Sites and other iframe hosts. */
 html,body{margin:0;min-height:0;background:#091011}#app{width:100%;max-width:none;padding:0}.masthead{height:48px;margin:0;padding:0 12px;border:0}.brand{font-size:18px;gap:8px}.brand .sigil{height:27px;width:27px}.brand-sub,.edition,.page-footer,.cabinet-label,.cabinet-bottom{display:none}.cabinet{padding:0;border:0;border-radius:0;box-shadow:none}.screen{border:0;border-radius:0;width:100%;aspect-ratio:16/9}.title-mark h1{font-size:clamp(36px,9vw,113px)}.title-screen{padding-top:4%}.title-foot{font-size:clamp(6px,.85vw,9px);gap:10px}.touch-controls{margin:8px 0;padding:0 10px}.toast{max-width:90%;text-align:center}.screen:focus{outline:0}
@@ -57,14 +61,16 @@ const {HoverboardRenderer}=__load("hoverboard-art.js");
 const {Renderer}=__load("art.js");
 const {AudioEngine}=__load("audio.js");
 const {Controls}=__load("input.js");
+const {GamepadMenu}=__load("gamepad-menu.js");
 const {HEROES,KEYMAP,clamp}=__load("data.js");
 const $=s=>document.querySelector(s),canvas=$('#game'),overlay=$('#overlay'),screen=$('#screen');
 const renderer=new Renderer(canvas),audio=new AudioEngine(),controls=new Controls();
+const menu=new GamepadMenu(overlay);
 screen.tabIndex=0;
 screen.addEventListener('pointerdown',event=>{if(event.target===canvas||event.target===screen)screen.focus({preventScroll:true});});
 const vehicleRenderer=new VehicleRenderer(renderer),hoverboardRenderer=new HoverboardRenderer(renderer);let missionStart=0;
 renderer.resize();window.addEventListener('resize',()=>renderer.resize());document.addEventListener('fullscreenchange',()=>renderer.resize());
-let game=null,view='title',selected=[0],difficulty='normal',last=performance.now(),paused=false,previousInputs=[],lastPadButtons=new Map(),toastTimer,highscore=0;
+let game=null,view='title',selected=[0],difficulty='normal',last=performance.now(),paused=false,previousInputs=[],toastTimer,highscore=0;
 let settings={volume:.35,music:true,scanlines:false,shake:true};
 const storage={get(key,fallback=null){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}},set(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch{}}};
 settings={...settings,...storage.get('tc-settings',{})};highscore=storage.get('tc-highscore',0);audio.volume=settings.volume;audio.music=settings.music;$('.scanlines').classList.toggle('off',!settings.scanlines);renderer.reducedMotion=!settings.shake||matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -82,6 +88,7 @@ function setView(name,html){
  document.querySelectorAll('[data-input^=hero]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.input.slice(4))===game?.hero)));
  if(name!=='playing'){controls.clear();game?.clearInput();}
  overlay.innerHTML=html;
+ menu.reset(name);
  $('#systemStatus').textContent=name==='playing'?'MISSION ACTIVE':name==='paused'?'SYSTEM PAUSED':'SYSTEM READY';
  $('#touchControls').classList.toggle('active',name==='playing');
  $('[data-input="jump"]').textContent=hoverboard||vehicle?'BOOST':'JUMP';
@@ -110,14 +117,10 @@ function resume(){if(!game)return;paused=false;controls.clear();game?.clearInput
 function settingsPanel(){setView('settings',`<div class="modal-shade"><div class="panel narrow"><div class="overline">FINE TUNE THE ARCADE</div><h2>AUDIO & DISPLAY</h2><label class="settings-row">Master volume <input id="volume" type="range" min="0" max="1" step=".01" value="${settings.volume}" aria-label="Master volume"></label><label class="settings-row">Original FM soundtrack <input id="music" type="checkbox" ${settings.music?'checked':''}></label><label class="settings-row">CRT scanlines <input id="scanlines" type="checkbox" ${settings.scanlines?'checked':''}></label><label class="settings-row">Screen shake & motion <input id="shake" type="checkbox" ${settings.shake?'checked':''}></label><button class="primary" id="settingsBack">← BACK</button></div></div>`);for(const name of ['volume','music','scanlines','shake'])$('#'+name).oninput=e=>{settings[name]=name==='volume'?Number(e.target.value):e.target.checked;storage.set('tc-settings',settings);audio.setVolume(settings.volume);audio.music=settings.music;$('.scanlines').classList.toggle('off',!settings.scanlines);renderer.reducedMotion=!settings.shake;};bind('#settingsBack',pausePanel);}
 function help(back=view){
  if(view==='playing'){paused=true;controls.clear();game?.clearInput();back='playing';}
- setView('help',`<div class="modal-shade"><div class="panel"><div class="panel-top"><div><div class="overline">THE THUNDERCAT FIELD MANUAL</div><h2>ONE HERO. EVERY FRONT.</h2></div><button class="close-button" id="helpBack">← BACK</button></div><table class="controls-table"><thead><tr><th>ACTION</th><th>KEYBOARD</th><th>GAMEPAD</th></tr></thead><tbody><tr><td>Move / steer</td><td>WASD / Arrow keys</td><td>Left stick / D-pad</td></tr><tr><td>Attack / fire</td><td>J / Space</td><td>X / Square</td></tr><tr><td>Jump / vehicle boost</td><td>K</td><td>A / Cross</td></tr><tr><td>Charged special</td><td>L</td><td>Y / Triangle</td></tr><tr><td>Dodge / evasive burst</td><td>I</td><td>B / Circle</td></tr><tr><td>Switch hero</td><td>1–4 / Q / E</td><td>RB / R1</td></tr><tr><td>Block on foot</td><td>Hold U</td><td>LB / L1</td></tr></tbody></table><div class="control-notes"><p><b>FIGHT ON FOOT.</b> Switch between all four heroes using 1–4 or Q/E, RB/R1, or the on-screen roster. Health percentage, power and continues are shared. Switching has a short cooldown and waits until your current attack, jump or special finishes. Chain three-hit combos, jump over ground attacks, and dodge or block when an amber ! warns of danger. Regular hits give 3% special charge, finishers 4%, crystals 12%. Lion-O summons the other ThunderCats; Panthro calls the Thundertank.</p><p><b>TAKE THE CONTROLS.</b> The six tank and aircraft routes scroll vertically from overhead. Steer in every direction, hold fire, dodge obstacles and marked enemy volleys. K / I triggers a short boost with a cooldown. Hit enemies to charge your vehicle weapon; press L at 100%. Collect + crates to repair the hull. Destroy the route boss to land and continue.</p><p><b>RIDE THE SPACE BOARDS.</b> At Tuskania Spillway and Berserker Coast, steer WilyKat and WilyKit together in a side view. Hold J or Space to throw pellets, use K or I to boost, and press L when the pellet burst is charged.</p></div><p class="small-note">Single-player campaign · ${STAGES.length} missions, including two Space Board chases. Any connected standard gamepad controls your hero. ESC / P pause · Enter starts / resumes · M mute · F fullscreen. Old co-op saves continue with the first selected hero.</p></div></div>`);bind('#helpBack',()=>back==='playing'?resume():back==='paused'?pausePanel():back==='lobby'?lobby():title());
+ setView('help',`<div class="modal-shade"><div class="panel"><div class="panel-top"><div><div class="overline">THE THUNDERCAT FIELD MANUAL</div><h2>ONE HERO. EVERY FRONT.</h2></div><button class="close-button" id="helpBack">← BACK</button></div><table class="controls-table"><thead><tr><th>ACTION</th><th>KEYBOARD</th><th>GAMEPAD</th></tr></thead><tbody><tr><td>Move / steer</td><td>WASD / Arrow keys</td><td>Left stick / D-pad</td></tr><tr><td>Attack / fire</td><td>J / Space</td><td>X / Square</td></tr><tr><td>Jump / vehicle boost</td><td>K</td><td>A / Cross</td></tr><tr><td>Charged special</td><td>L</td><td>Y / Triangle</td></tr><tr><td>Dodge / evasive burst</td><td>I</td><td>B / Circle</td></tr><tr><td>Switch hero</td><td>1–4 / Q / E</td><td>RB / R1</td></tr><tr><td>Block on foot</td><td>Hold U</td><td>LB / L1</td></tr></tbody></table><div class="control-notes"><p><b>FIGHT ON FOOT.</b> Switch between all four heroes using 1–4 or Q/E, RB/R1, or the on-screen roster. Health percentage, power and continues are shared. Switching has a short cooldown and waits until your current attack, jump or special finishes. Chain three-hit combos, jump over ground attacks, and dodge or block when an amber ! warns of danger. Regular hits give 3% special charge, finishers 4%, crystals 12%. Lion-O summons the other ThunderCats; Panthro calls the Thundertank.</p><p><b>TAKE THE CONTROLS.</b> The six tank and aircraft routes scroll vertically from overhead. Steer in every direction, hold fire, dodge obstacles and marked enemy volleys. K / I triggers a short boost with a cooldown. Hit enemies to charge your vehicle weapon; press L at 100%. Collect + crates to repair the hull. Destroy the route boss to land and continue.</p><p><b>RIDE THE SPACE BOARDS.</b> At Tuskania Spillway and Berserker Coast, steer WilyKat and WilyKit together in a side view. Hold J or Space to throw pellets, use K or I to boost, and press L when the pellet burst is charged.</p></div><p class="small-note">Single-player campaign · ${STAGES.length} missions, including two Space Board chases. In menus, use the D-pad or left stick to move, A / Cross to select, and B / Circle to go back. Select a field to edit it, then press A / Cross to apply or B / Circle to cancel. ESC / P pause · Enter starts / resumes · M mute · F fullscreen. Old co-op saves continue with the first selected hero.</p></div></div>`);bind('#helpBack',()=>back==='playing'?resume():back==='paused'?pausePanel():back==='lobby'?lobby():title());
 }
 function stageClear(){paused=true;const next=STAGES[game.stageIndex+1];const checkpoint=game.snapshot(true);storage.set('tc-save',checkpoint);setView('stageclear',`<div class="modal-shade"><div class="panel narrow"><div class="overline">THE MUTANTS RETREAT</div><h2>CHAPTER COMPLETE</h2><div class="result-stats"><div><strong>${String(game.score).padStart(6,'0')}</strong><span>SCORE</span></div><div><strong>${game.bestCombo}</strong><span>BEST COMBO</span></div><div><strong>${game.kills}</strong><span>DEFEATED</span></div></div><p>UP NEXT · ${next.name}<br>${next.story}</p><div class="button-stack"><button class="primary" id="nextStage">ONWARD, THUNDERCATS →</button><button class="secondary" id="clearTitle">SAVE & TITLE</button></div></div></div>`);bind('#nextStage',()=>{game.nextStage();paused=false;setView('playing','');storage.set('tc-save',game.snapshot());});bind('#clearTitle',title);}
 function result(type){paused=true;const victory=type==='victory';if(game.score>highscore){highscore=game.score;storage.set('tc-highscore',highscore);}if(victory)storage.set('tc-save',null);setView(type,`<div class="modal-shade"><div class="panel narrow"><div class="overline">${victory?'TRUTH. JUSTICE. HONOR. LOYALTY.':'ANCIENT EVIL STILL RISES'}</div><h2>${victory?'THIRD EARTH IS FREE':'THE FIGHT ISN’T OVER'}</h2><p>${victory?'Mumm-Ra is defeated. The ThunderCats stand together.<br>Third Earth has its heroes.':'Gather your strength. Your chapter checkpoint awaits.'}</p><div class="result-stats"><div><strong>${game.score}</strong><span>FINAL SCORE</span></div><div><strong>${game.bestCombo}</strong><span>BEST COMBO</span></div><div><strong>${fmtTime(game.time)}</strong><span>TIME</span></div></div><p>${game.stage.mode==="hoverboard"?`WilyKat and WilyKit · ${game.players[0].kills} defeated`:game.players.map(p=>`${HEROES[p.hero].name} · ${p.kills} defeated`).join('<br>')}</p><div class="button-stack"><button class="primary" id="retry">${victory?'A NEW ADVENTURE':'RETRY CHAPTER'} →</button><button class="secondary" id="resultTitle">RETURN TO TITLE</button></div></div></div>`);bind('#retry',()=>victory?lobby():startGame(new Game({heroes:game.players.map(p=>p.hero),difficulty:game.difficulty,stage:game.stageIndex,onEvent:gameEvent})));bind('#resultTitle',title);}
-function getInputs(){
- return controls.sample(1,gamepads(),{single:true});
-}
-function padMenu(){const pads=gamepads();for(const pad of pads){if(!pad)continue;for(const index of [0,1,9]){const key=pad.index+':'+index,pressed=pad.buttons[index]?.pressed;if(pressed&&!lastPadButtons.get(key)){audio.init();if(index===9){if(view==='playing')pause();else if(view==='paused')resume();else if(view==='title')lobby();else if(view==='lobby')$('#begin')?.click();else if(view==='stageclear')$('#nextStage')?.click();}else if(index===0&&view==='title')lobby();else if(index===1&&view==='lobby')title();}lastPadButtons.set(key,!!pressed);}}}
 const gameKeys=new Set(KEYMAP.flatMap(m=>Object.values(m)));
 window.addEventListener('keydown',e=>{
  if(e.target instanceof HTMLSelectElement||e.target instanceof HTMLInputElement)return;
@@ -136,8 +139,11 @@ $('#soundButton').onclick=toggleSound;$('#fullscreenButton').onclick=fullscreen;
 document.querySelectorAll('[data-input]').forEach(b=>{b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);controls.setTouch(b.dataset.input,true);audio.init();});for(const name of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(name,e=>{e.preventDefault();controls.setTouch(b.dataset.input,false);});});
 window.addEventListener('pagehide',()=>{if(game&&view!=='stageclear'&&game.status!=='victory')storage.set('tc-save',game.snapshot());});
 let accumulator=0;
-function frame(now){const dt=Math.min((now-last)/1000,.08);last=now;padMenu();
- if(view==='playing'&&game&&!paused){accumulator+=dt;let first=true;while(accumulator>=1/60){const input=first?getInputs():previousInputs.map(v=>({...v,attack:v.attackHeld??v.attack,attackPressed:false,jumpPressed:false,specialPressed:false,dodgePressed:false,switchNextPressed:false,switchPrevPressed:false,targetHero:undefined}));game.update(1/60,input);previousInputs=input;accumulator-=1/60;first=false;}}else accumulator=0;
+function frame(now){const dt=Math.min((now-last)/1000,.08);last=now;
+ const pad=Array.from(gamepads()).find(p=>p&&p.connected!==false);
+ menu.update(pad,now,view,pause);
+ const gameplayPad=menu.gameplayPad(pad);
+ if(view==='playing'&&game&&!paused){accumulator+=dt;let first=true;while(accumulator>=1/60){const input=first?controls.sample(1,[gameplayPad],{single:true}):previousInputs.map(v=>({...v,attack:v.attackHeld??v.attack,attackPressed:false,jumpPressed:false,specialPressed:false,dodgePressed:false,switchNextPressed:false,switchPrevPressed:false,targetHero:undefined}));game.update(1/60,input);previousInputs=input;accumulator-=1/60;first=false;}}else accumulator=0;
  const renderOptions={demo:!game,alpha:view==='playing'&&!paused?accumulator*60:1};
  if(game?.active.mode==='vehicle')vehicleRenderer.render(game.active,dt,renderOptions);
  else if(game?.active.mode==='hoverboard')hoverboardRenderer.render(game.active,dt,renderOptions);
@@ -1988,6 +1994,159 @@ class Controls{
 }
 
 return {Controls};
+},
+"gamepad-menu.js":()=>{
+const FOCUSABLE='button:not(:disabled), select:not(:disabled), input:not(:disabled)';
+const BACK={lobby:'#backTitle',paused:'#resume',settings:'#settingsBack',help:'#helpBack',stageclear:'#clearTitle',gameover:'#resultTitle',victory:'#resultTitle'};
+const START={title:'#newGame',lobby:'#begin',paused:'#resume',stageclear:'#nextStage'};
+
+function direction(pad){
+ const pressed=index=>!!pad.buttons[index]?.pressed;
+ const horizontal=Number(pressed(15))-Number(pressed(14));
+ const vertical=Number(pressed(13))-Number(pressed(12));
+ if(horizontal||vertical)return horizontal?(horizontal<0?'left':'right'):(vertical<0?'up':'down');
+ const [x=0,y=0]=pad.axes||[];
+ if(Math.max(Math.abs(x),Math.abs(y))<.55)return null;
+ if(Math.abs(x)>Math.abs(y))return x<0?'left':'right';
+ return y<0?'up':'down';
+}
+
+function editable(element){
+ return element.matches('select,input[type="range"]');
+}
+
+function adjust(element,step){
+ const old=element.value;
+ if(element instanceof HTMLSelectElement){
+  const options=[...element.options].filter(option=>!option.disabled);
+  const index=options.indexOf(element.selectedOptions[0])+step;
+  if(options[index])element.value=options[index].value;
+ }else if(step>0){
+  element.stepUp();
+ }else{
+  element.stepDown();
+ }
+ if(element.value!==old)dispatchValue(element);
+}
+
+function dispatchValue(element){
+ element.dispatchEvent(new Event('input',{bubbles:true}));
+ element.dispatchEvent(new Event('change',{bubbles:true}));
+}
+
+class GamepadMenu{
+ constructor(overlay){
+  this.overlay=overlay;
+  this.pressed=new Set();
+  this.blocked=new Set();
+  const clear=()=>{
+   this.active=false;
+   this.endEdit();
+   this.focused?.removeAttribute('data-pad-focus');
+  };
+  window.addEventListener('pointerdown',clear);
+  window.addEventListener('keydown',clear);
+ }
+
+ reset(view){
+  this.endEdit();
+  this.focused=null;
+  if(this.active&&view!=='playing')this.focus(this.initial(view));
+ }
+
+ initial(view){
+  if(view==='lobby')return this.overlay.querySelector('.hero-card.selected');
+  if(view==='settings')return this.overlay.querySelector('#volume');
+  return this.overlay.querySelector('.primary')||this.overlay.querySelector(FOCUSABLE);
+ }
+
+ focus(element){
+  if(!element)return;
+  this.focused?.removeAttribute('data-pad-focus');
+  this.focused=element;
+  element.setAttribute('data-pad-focus','');
+  element.focus({preventScroll:true});
+  element.scrollIntoView({block:'nearest',inline:'nearest'});
+ }
+
+ endEdit(cancel=false){
+  const element=this.editing;
+  if(!element)return;
+  if(cancel&&element.value!==this.originalValue){
+   element.value=this.originalValue;
+   dispatchValue(element);
+  }
+  element.removeAttribute('data-pad-edit');
+  this.editing=null;
+ }
+
+ move(from,dir){
+  const origin=from.getBoundingClientRect();
+  const horizontal=dir==='left'||dir==='right';
+  const sign=dir==='left'||dir==='up'?-1:1;
+  const x=origin.left+origin.width/2,y=origin.top+origin.height/2;
+  let nearest,closest=Infinity;
+  for(const candidate of this.overlay.querySelectorAll(FOCUSABLE)){
+   if(candidate===from||!candidate.getClientRects().length)continue;
+   const box=candidate.getBoundingClientRect();
+   const dx=box.left+box.width/2-x,dy=box.top+box.height/2-y;
+   const forward=(horizontal?dx:dy)*sign;
+   if(forward<4)continue;
+   const side=Math.abs(horizontal?dy:dx);
+   const score=forward+side*2;
+   if(score<closest){closest=score;nearest=candidate;}
+  }
+  if(nearest)this.focus(nearest);
+  else if(!horizontal)this.overlay.querySelector('.panel')?.scrollBy(0,sign*72);
+ }
+
+ update(pad,now,view,pause){
+  const previous=this.pressed;
+  this.pressed=new Set([0,1,9].filter(index=>pad?.buttons[index]?.pressed));
+  const tapped=index=>this.pressed.has(index)&&!previous.has(index);
+  const dir=pad?direction(pad):null;
+  const move=dir&&(dir!==this.heldDirection||now>=this.repeatAt);
+  if(move)this.repeatAt=now+(dir===this.heldDirection?110:340);
+  this.heldDirection=dir;
+  if(view==='playing'){
+   if(tapped(9)){this.active=true;pause();}
+   return;
+  }
+  this.blocked=new Set([0,1].filter(index=>this.pressed.has(index)));
+  if(!move&&!tapped(0)&&!tapped(1)&&!tapped(9))return;
+  this.active=true;
+  const focused=document.activeElement;
+  const element=this.overlay.contains(focused)&&focused.matches(FOCUSABLE)?focused:this.initial(view);
+  if(element!==this.focused||!element?.hasAttribute('data-pad-focus'))this.focus(element);
+  if(this.editing){
+   if(tapped(1))this.endEdit(true);
+   else if(tapped(0)||tapped(9))this.endEdit();
+   else if(move)adjust(this.editing,dir==='left'||dir==='up'?-1:1);
+  }else if(tapped(1)){
+   if(BACK[view])this.overlay.querySelector(BACK[view])?.click();
+  }else if(tapped(9)&&START[view]){
+   this.overlay.querySelector(START[view])?.click();
+  }else if(tapped(0)&&element){
+   if(editable(element)){
+    this.editing=element;
+    this.originalValue=element.value;
+    element.setAttribute('data-pad-edit','');
+   }else element.click();
+  }else if(move&&element){
+   this.move(element,dir);
+  }
+ }
+
+ gameplayPad(pad){
+  for(const index of this.blocked)if(!pad?.buttons[index]?.pressed)this.blocked.delete(index);
+  if(!this.blocked.size)return pad;
+  // A menu confirmation should not also jump or dodge when play starts.
+  const buttons=Array.from(pad.buttons,(button,index)=>this.blocked.has(index)?{pressed:false}:button);
+  return {index:pad.index,connected:pad.connected,axes:pad.axes,buttons};
+ }
+}
+
+return {GamepadMenu};
 },
 "combat.js":()=>{
 // Startup, active and recovery are seconds at the game's fixed 60 Hz simulation rate.

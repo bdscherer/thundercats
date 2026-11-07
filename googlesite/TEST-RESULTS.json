@@ -1,10 +1,10 @@
 {
-  "testedAt": "2026-11-07T20:42:48.664Z",
+  "testedAt": "2026-11-07T22:19:09.164Z",
   "scope": "Local static hosting, cross-origin sandboxed iframe, and opaque-origin standalone iframe; not a published Google Site.",
   "checks": [
     {
       "name": "Subdirectory paths, modules, artwork, MIME types, redirect and private-file protection",
-      "files": 53,
+      "files": 54,
       "passed": true
     },
     {

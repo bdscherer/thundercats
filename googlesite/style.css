@@ -9,3 +9,7 @@ canvas,.hero-card canvas{image-rendering:auto}.hero-card canvas{height:122px}.ti
 @media(max-width:800px){.hero-card canvas{height:68px}}
 .lobby-bottom{flex-wrap:wrap;gap:12px}.lobby-bottom .field:first-child{flex:1 1 280px;min-width:0;max-width:48%}.lobby-bottom .field select{max-width:100%;text-overflow:ellipsis}.lobby-bottom .primary{flex:0 0 auto}@media(max-width:800px){.lobby-bottom .field:first-child{max-width:100%;flex-basis:100%}.lobby-bottom .primary{flex:1}}
 .hero-switch{position:absolute;z-index:3;top:23%;left:2.3%;display:flex;align-items:center;gap:4px;font:700 clamp(6px,.75vw,10px) system-ui;color:#c9d7cf}.hero-switch[hidden]{display:none}.hero-switch button{font:inherit;padding:5px 7px;min-height:26px;color:#d6e2d8;background:#102632dc;border:1px solid #50636b;border-radius:3px;touch-action:none;cursor:pointer}.hero-switch button[aria-pressed=true]{border-color:#efd28c;color:#ffe7a6;background:#3b493ee8}.hero-switch button:focus-visible{outline:2px solid #f6e0a1;outline-offset:2px}@media(max-width:600px){.hero-switch{top:23%;gap:2px;font-size:6px}.hero-switch>span{display:none}.hero-switch button{padding:4px;min-height:25px}}
+
+/* Controller focus stays visible even after a mouse click. */
+.overlay [data-pad-focus]{outline:3px solid #ffdc8e;outline-offset:2px;scroll-margin:6px}
+.overlay [data-pad-edit]{outline:3px dashed #9bedeb}

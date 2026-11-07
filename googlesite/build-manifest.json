@@ -1,8 +1,8 @@
 {
-  "builtAt": "2026-11-07T20:42:36.766Z",
+  "builtAt": "2026-11-07T22:18:05.739Z",
   "entry": "index.html",
   "standalone": "standalone.html",
-  "standaloneBytes": 100389865,
+  "standaloneBytes": 100395250,
   "runtimeAssets": 36,
   "files": [
     {
@@ -12,8 +12,8 @@
     },
     {
       "path": "style.css",
-      "bytes": 12543,
-      "sha256": "66e643693a9dddd54ef673127550dd3afb698ad9c418b363fde45ab01eb79b3a"
+      "bytes": 12750,
+      "sha256": "96961e2808dba52f94ed9c7b5735831c968fff9b0afdae5eadf68d69632e50ff"
     },
     {
       "path": "embed.css",
@@ -22,13 +22,13 @@
     },
     {
       "path": "standalone.html",
-      "bytes": 100389865,
-      "sha256": "efae679dae3fe2ae60257bc5b1f5be1bb4899f277c7e8f02580a561fbde5e13a"
+      "bytes": 100395250,
+      "sha256": "f5e7763c42c9391ce9228ecad31f19a3ab0d7f04ab855a9628b02ffde7ad88f5"
     },
     {
       "path": "src/main.js",
-      "bytes": 19412,
-      "sha256": "ff98c4ba5ee71e68b2660d279f51dcffa66f7fb80fb7f93a4da6ad044cb5c393"
+      "bytes": 19154,
+      "sha256": "0ce0a1df827ab106afbea94b16fc75c78bead0a600305d6a160f1f34875449fe"
     },
     {
       "path": "src/campaign.js",
@@ -74,6 +74,11 @@
       "path": "src/input.js",
       "bytes": 2789,
       "sha256": "55537aa54cae81af91a22d80a3ee04a146331e3934f81f43a295b3a6a075f10b"
+    },
+    {
+      "path": "src/gamepad-menu.js",
+      "bytes": 5393,
+      "sha256": "bc0dd49c0cc36029aa5f0bcf7c0ad3c4c63a65f79aec4c0d2cc0d6a94121a2ea"
     },
     {
       "path": "src/combat.js",
