@@ -1,6 +1,6 @@
 # ThunderCats: Third Earth
 
-A single-player arcade fan game with nineteen missions: twelve side-scrolling beat-’em-up chapters, six top-down vehicle routes, and a side-scrolling Space Board chase starring WilyKat and WilyKit. Switch between Lion-O, Cheetara, Panthro and Tygra on foot or in the tank and aircraft. HD inked cartoon artwork follows the original 1980s ThunderCats designs, with music and effects synthesized in real time.
+A single-player arcade fan game with twenty missions: twelve side-scrolling beat-’em-up chapters, six top-down vehicle routes, and two side-scrolling Space Board chases starring WilyKat and WilyKit. Switch between Lion-O, Cheetara, Panthro and Tygra on foot or in the tank and aircraft. HD inked cartoon artwork follows the original 1980s ThunderCats designs, with music and effects synthesized in real time.
 
 ## Play
 
@@ -18,7 +18,7 @@ Choose one hero, a difficulty, and a starting mission. Start at mission 01 for t
 
 For another device on the same network, use the **Network** address printed in the terminal, such as `http://192.168.1.163:4173`. The server listens on all IPv4 interfaces by default. If Windows prompts, allow Node.js on the Private network. `localhost` on another device points to that device. Set `HOST=127.0.0.1` for computer-only access. Every device runs its own single-player game.
 
-## Nineteen missions
+## Twenty missions
 
 | Mission | Boss | Signature threat |
 | --- | --- | --- |
@@ -26,25 +26,26 @@ For another device on the same network, use the **Network** address printed in t
 | 02 · Thundertank: Canyon Run | Monkian · Fistpounder | Cannon spreads and mine drops. |
 | 03 · Whispering Forest | Slithe | Venom pools, cleaves and charges. |
 | 04 · ThunderClaw: Sky Chase | Vultureman · Skycutter | Crossfire from both wings. |
-| 05 · Lost City | Grune the Destroyer | Mace strikes send fault lines across the plaza. |
-| 06 · Burning Sands | Safari Joe | Rifle spreads and snares that slow the hero. |
-| 07 · Feliner: Orbital Assault | Ratar-O · Ratstar | Wide orbital volleys and fighter escorts. |
-| 08 · Treetop Heights | Red-Eye | Thrown discs double back across canopy bridges. |
-| 09 · Snowman’s Pass | Chilla | Frost bursts slow movement on the ice. |
-| 10 · Thundertank: Glacier Run | Tug-Mug · Luna Tacker | Slow volleys and marked gravity blasts. |
-| 11 · Fire Rock Mountain | The Demolisher | Lunging uppercuts and shockwaves. |
-| 12 · River of Despair | The Mad Bubbler | Drifting bubble volleys and poison zones. |
-| 13 · ThunderClaw: Tempest Strike | Alluro · Skytomb | Psychic bursts overlap the storm’s lightning. |
-| 14 · Castle Plun-Darr | Luna and Amok | Luna commands Amok, who pounces across the arena. |
-| 15 · Mutant Foundry | Driller | Tunnels under the hero and leaves delayed eruptions. |
-| 16 · Feliner: Deep Space | Captain Shiner · Vertus | Charged lasers sweep an entire marked column. |
-| 17 · Astral Gate | Shadowmaster and Zaxx | Crossing shadow rifts and medallion volleys. |
-| 18 · Space Boards: Berserker Coast | Hammerhand | Cannon lanes and a mechanical fist after a side-scrolling chase through sea stacks. |
-| 19 · Black Pyramid | Mumm-Ra the Ever-Living | Spirit patterns, reinforcements and teleportation. |
+| 05 · Space Boards: Tuskania Spillway | Giant Technopede | Floodgate gaps and star shells that split in flight. |
+| 06 · Lost City | Grune the Destroyer | Mace strikes send fault lines across the plaza. |
+| 07 · Burning Sands | Safari Joe | Rifle spreads and snares that slow the hero. |
+| 08 · Feliner: Orbital Assault | Ratar-O · Ratstar | Wide orbital volleys and fighter escorts. |
+| 09 · Treetop Heights | Red-Eye | Thrown discs double back across canopy bridges. |
+| 10 · Snowman’s Pass | Chilla | Frost bursts slow movement on the ice. |
+| 11 · Thundertank: Glacier Run | Tug-Mug · Luna Tacker | Slow volleys and marked gravity blasts. |
+| 12 · Fire Rock Mountain | The Demolisher | Lunging uppercuts and shockwaves. |
+| 13 · River of Despair | The Mad Bubbler | Drifting bubble volleys and poison zones. |
+| 14 · ThunderClaw: Tempest Strike | Alluro · Skytomb | Psychic bursts overlap the storm’s lightning. |
+| 15 · Castle Plun-Darr | Luna and Amok | Luna commands Amok, who pounces across the arena. |
+| 16 · Mutant Foundry | Driller | Tunnels under the hero and leaves delayed eruptions. |
+| 17 · Feliner: Deep Space | Captain Shiner · Vertus | Charged lasers sweep an entire marked column. |
+| 18 · Astral Gate | Shadowmaster and Zaxx | Crossing shadow rifts and medallion volleys. |
+| 19 · Space Boards: Berserker Coast | Hammerhand | Cannon lanes and a mechanical fist after a side-scrolling chase through sea stacks. |
+| 20 · Black Pyramid | Mumm-Ra the Ever-Living | Spirit patterns, reinforcements and teleportation. |
 
 Seven new illustrated environments are packed into two background atlases and loaded when first needed. They retain the soft scenery joins and gradual section lighting. Each new ground mission has four areas with its own floor material, weather or movement mechanic, encounter formations, and a final boss arena.
 
-The campaign features 21 distinct original-series villains in 19 encounters. Bosses have three health phases, marked windups and recovery windows. Duo bosses stagger their windups and have separate phase bars. The [art and research notes](assets/ART.md#distinct-villain-roster) document the cartoon references and game-specific adaptations.
+The campaign features 22 distinct original-series villains in 20 encounters. Bosses have three health phases, marked windups and recovery windows. Duo bosses stagger their windups and have separate phase bars. The [art and research notes](assets/ART.md#distinct-villain-roster) document the cartoon references and game-specific adaptations.
 
 Switch with **1–4**, **Q/E**, **Tab**, **RB/R1**, or the on-screen roster. Health percentage, special charge, score and continues carry across heroes; changing pilots leaves vehicle hull and weapons intact. Switching has a 0.75-second cooldown and a 1.2-second input buffer for attack recovery. It does not cancel hurt, jumps, falls or active summon sequences. Saves preserve the selected hero and stable mission identity; older final-pyramid checkpoints still load the final pyramid.
 
@@ -52,7 +53,7 @@ The original cartoon’s Thundertank, ThunderClaw and Feliner have their own ove
 
 Vehicle hull health is separate from the hero’s on-foot health. A destroyed vehicle spends one of the hero’s continues and returns with full hull and brief protection; no continues remaining ends the run. Defeat the boss to continue on foot with the same hero, score, special charge and remaining continues.
 
-At Berserker Coast, steer WilyKat and WilyKit together with WASD, arrow keys, or the gamepad. Hold **J / Space** to throw trick pellets from both boards. Press **K / I** to boost through danger or **L** for their charged pellet burst. The twins share armor and continues. After the gunboat fight, your selected hero resumes the campaign at the Black Pyramid.
+In Tuskania Spillway and Berserker Coast, steer WilyKat and WilyKit together with WASD, arrow keys, or the gamepad. Hold **J / Space** to throw trick pellets from both boards. Press **K / I** to boost through danger or **L** for their charged pellet burst. The twins share armor and continues. After each chase, your selected hero resumes the campaign.
 
 Ground chapters are 9,400–13,800 world units long, with 7–10 encounters, three or four themed sections, reinforcement waves, supplies, environmental hazards and a boss. Eight troop roles include soldiers, brutes, archers, shield guards, spear fighters, scouts, bomb throwers and spirit casters. Break shields with finishers, aerial attacks or attacks from behind. Move out of marked blasts and prioritize summoning casters.
 
@@ -101,7 +102,7 @@ npm run test:campaign
 npm run test:vehicles
 ```
 
-The 108 unit tests cover combat, input, checkpoint migration, hero switching, phase transitions, the distinct boss roster and signature attacks, environment hazards, vehicle handling, transitions, and hole falls. Retained multiplayer engine fixtures exercise backward compatibility; the playable campaign always creates one active hero.
+The 109 unit tests cover combat, input, checkpoint migration, hero switching, phase transitions, the distinct boss roster and signature attacks, environment hazards, vehicle handling, transitions, and hole falls. Retained multiplayer engine fixtures exercise backward compatibility; the playable campaign always creates one active hero.
 
 Holes have cracked, perspective rims with matching foot collision. Walking or landing inside plays a fall animation, removes 22% of maximum health (rounded up), and returns the hero to nearby safe ground. The hero blinks and has damage protection for one second after returning, with movement immediately available. Jump over openings or walk around them; guard, dodge and invisibility cannot prevent a fall. Lion-O uses a separate corrected eight-frame run sheet with one sword and one claw shield.
 
@@ -127,4 +128,4 @@ Additional checks: `npm run test:motion`, `npm run test:world`, `npm run test:ta
 
 Artwork, references and generation prompts are documented in [assets/ART.md](assets/ART.md).
 
-`npm run test:expansion` starts its own server and checks the ten expedition missions, the 19-entry mission selector, keyboard/controller/on-screen hero switching, shared health and charge, duo boss bars, checkpoint resume, and mobile layout. The iframe check also tests Space Board steering, both riders’ pellets, boost, and charged burst. Both checks can use installed Chrome on Windows or `CHROME_PATH`.
+`npm run test:expansion` starts its own server and checks the ten expedition missions, the 20-entry mission selector, keyboard/controller/on-screen hero switching, shared health and charge, duo boss bars, checkpoint resume, and mobile layout. The iframe check also tests Space Board steering, both riders’ pellets, boost, and charged burst. Both checks can use installed Chrome on Windows or `CHROME_PATH`.

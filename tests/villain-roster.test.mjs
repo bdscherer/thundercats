@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {CAMPAIGN,Campaign} from '../src/campaign.js';
 import {GROUND_BOSSES} from '../src/bosses.js';
 
-test('all 19 missions spawn distinct villains, including both members of each duo',()=>{
+test('all 20 missions spawn distinct villains, including both members of each duo',()=>{
  const roster=[];
  for(const [stage,mission] of CAMPAIGN.entries()){
   const {active:g}=new Campaign({stage});
@@ -14,10 +14,10 @@ test('all 19 missions spawn distinct villains, including both members of each du
   assert.ok(names.length>=1,mission.id);
   roster.push(...names);
  }
- assert.equal(CAMPAIGN.length,19);
+ assert.equal(CAMPAIGN.length,20);
  assert.equal(CAMPAIGN.filter(m=>m.villains.length===2).length,2);
- assert.equal(roster.length,21);
- assert.equal(new Set(roster).size,21);
+ assert.equal(roster.length,22);
+ assert.equal(new Set(roster).size,22);
 });
 
 function signature(id){

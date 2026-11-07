@@ -1,11 +1,22 @@
 import {DIFFICULTIES, SPECIAL_CHARGE, clamp} from './data.js';
 import {approach} from './combat.js';
 
+export const TUSKANIA_SPILLWAY = {
+ id:'tuskania-spillway', mode:'hoverboard', name:'SPACE BOARDS · TUSKANIA SPILLWAY',
+ title:'TUSKANIA SPILLWAY',
+ story:'The Giant Technopede is headed for Tuskania’s water supply. WilyKat and WilyKit take their Space Boards through the spillway to intercept it.',
+ sections:['HEADWATER BLUFFS','THE FLOODGATES','TUSKANIA RESERVOIR'],
+ background:'assets/tuskania-spillway.png', bossArt:'assets/giant-technopede.png',
+ length:9200, speed:218, bossType:'technopede', boss:'GIANT TECHNOPEDE', bossHp:1230
+};
+
 export const HOVERBOARD_MISSION = {
  id:'berserker-coast', mode:'hoverboard', name:'SPACE BOARDS · BERSERKER COAST',
+ title:'BERSERKER COAST',
  story:'WilyKat and WilyKit skim the pirate coast on their Space Boards. Weave through sea stacks, fend off the raiders, and stop Hammerhand’s gunboat.',
  sections:['SUNSET BLUFFS','THE SEA STACKS','BERSERKER WATERS'],
- length:11000, bossType:'hammerhand', boss:'HAMMERHAND'
+ background:'assets/berserker-coast.png', bossArt:'assets/hammerhand-gunboat.png',
+ length:11000, speed:235, bossType:'hammerhand', boss:'HAMMERHAND', bossHp:1700
 };
 
 // Vertical coordinates describe altitude on the side-view screen.
@@ -37,7 +48,12 @@ export class HoverboardGame {
    this.enemies.push({type:i===1?'raider':'scout',x:1010+i*74,y:band+i*25,baseY:band+i*25,
     hp:i===1?48:24,age:0,fireCd:1.25+i*.26});
   }
-  if(this.sectionIndex>0||pattern%2===1){
+  if(this.stage.id===TUSKANIA_SPILLWAY.id){
+   if(this.sectionIndex>0||pattern%2===1){
+    const opening=[221,337,258,311][pattern%4];
+    this.obstacles.push({kind:'gate',x:1320,y:opening,gap:this.sectionIndex===2?154:180,width:90});
+   }
+  }else if(this.sectionIndex>0||pattern%2===1){
    const bottom=pattern%2===0;
    this.obstacles.push({x:1280,y:bottom?370:185,bottom,width:110});
    if(this.sectionIndex>0&&pattern%3===1)this.obstacles.push({x:1510,y:bottom?195:350,bottom:!bottom,width:96});
@@ -49,7 +65,7 @@ export class HoverboardGame {
   this.bossStarted=true;
   this.obstacles=[];
   this.pickups=[];
-  const maxHp=Math.round(1700*this.rules.health);
+  const maxHp=Math.round(this.stage.bossHp*this.rules.health);
   this.enemies.push({type:this.stage.bossType,villain:this.stage.bossType,boss:true,
    x:1120,y:364,hp:maxHp,maxHp,phase:0,age:0,fireCd:1.5,volley:0,warning:null});
   this.onEvent('encounter',{boss:true});
@@ -119,24 +135,27 @@ export class HoverboardGame {
   }
  }
 
- fire(x,y,angle,speed,power){
-  this.projectiles.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,power});
+ fire(x,y,angle,speed,power,kind){
+  this.projectiles.push({x,y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,power,kind});
  }
 
  updateBoss(e,dt){
   const p=this.board;
   e.x=approach(e.x,790,155*dt);
-  e.y=365+Math.sin(e.age*1.6)*12;
+  e.y=365+Math.sin(e.age*1.6)*(e.type==='technopede'?21:12);
   e.phase=e.hp<e.maxHp*.27?2:e.hp<e.maxHp*.63?1:0;
   if(e.x>865)return;
+  if(e.type==='technopede'){
+   this.updateTechnopede(e,dt);
+   return;
+  }
   if(e.warning){
    const warning=e.warning;
    warning.time-=dt;
    if(warning.time>0)return;
    if(warning.kind==='grapple'){
     // A straight mechanical fist leaves the other altitudes open.
-    this.fire(e.x-55,warning.y,Math.PI,590,34);
-    this.projectiles.at(-1).fist=true;
+    this.fire(e.x-55,warning.y,Math.PI,590,34,'fist');
    }else{
     for(const y of warning.lanes){
      this.fire(e.x-70,y,Math.PI,335+e.phase*42,23);
@@ -160,6 +179,43 @@ export class HoverboardGame {
    const y=clamp(p.y,140,423);
    const lanes=e.phase===0?[y]:[y,y<282?y+110:y-110];
    e.warning={kind:'cannon',lanes,time:.93-e.phase*.08};
+  }
+ }
+
+ updateTechnopede(e,dt){
+  if(e.warning){
+   e.warning.time-=dt;
+   if(e.warning.time>0)return;
+   for(const y of e.warning.lanes)this.fire(e.x-120,y,Math.PI,237+e.phase*25,21,'star-shell');
+   e.warning=null;
+   e.fireCd=1.65-e.phase*.2;
+   this.onEvent('enemySwing');
+   return;
+  }
+  if(e.fireCd>0)return;
+  const y=clamp(this.board.y,155,414);
+  const lanes=e.phase>0&&e.volley++%2===0?[y,y<287?y+114:y-114]:[y];
+  e.warning={kind:'star-shell',lanes,time:1.04-e.phase*.09};
+ }
+
+ updateProjectiles(dt){
+  const projectiles=this.projectiles,bursts=[],p=this.board;
+  for(const shot of projectiles){
+   shot.x+=shot.vx*dt;
+   shot.y+=shot.vy*dt;
+   const fist=shot.kind==='fist';
+   if(Math.abs(p.x-shot.x)<(fist?38:22)&&Math.abs(p.y-shot.y)<(fist?31:20)){
+    this.damage(shot.power);
+    shot.spent=true;
+    if(this.projectiles!==projectiles)return;
+   }else if(shot.kind==='star-shell'&&shot.x<=482){
+    bursts.push(shot);
+    shot.spent=true;
+   }
+  }
+  for(const shell of bursts){
+   for(const offset of [-.72,-.36,0,.36,.72])this.fire(shell.x,shell.y,Math.PI+offset,275,13,'spark');
+   this.effects.push({x:shell.x,y:shell.y,life:.36});
   }
  }
 
@@ -193,7 +249,7 @@ export class HoverboardGame {
   if(input.attack||input.attackPressed)this.shoot();
   if(input.specialPressed)this.special();
 
-  const scrollSpeed=this.bossStarted?112:235;
+  const scrollSpeed=this.bossStarted?112:this.stage.speed;
   this.prevScroll=this.scroll;
   this.scroll+=scrollSpeed*dt;
   if(!this.bossStarted){
@@ -228,16 +284,13 @@ export class HoverboardGame {
     :Math.abs(e.x-shot.x)<31&&Math.abs(e.y-shot.y)<24));
    if(enemy){this.hit(enemy,shot.power);shot.spent=true;}
   }
-  for(const shot of this.projectiles){
-   shot.x+=shot.vx*dt;
-   shot.y+=shot.vy*dt;
-   if(Math.abs(p.x-shot.x)<(shot.fist?38:22)&&Math.abs(p.y-shot.y)<(shot.fist?31:20)){
-    this.damage(shot.power);
-    shot.spent=true;
-   }
-  }
+  this.updateProjectiles(dt);
   for(const rock of this.obstacles){
    rock.x-=scrollSpeed*dt;
+   if(rock.kind==='gate'){
+    if(Math.abs(p.x-rock.x)<rock.width/2+12&&Math.abs(p.y-rock.y)>rock.gap/2-12)this.damage(26);
+    continue;
+   }
    const depth=rock.bottom?p.y-rock.y:rock.y-p.y;
    const halfWidth=Math.min(rock.width*.63,rock.width*.16+depth*.55);
    if(depth>8&&Math.abs(p.x-rock.x)<halfWidth+12)this.damage(30);

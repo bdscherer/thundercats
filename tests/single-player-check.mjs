@@ -15,7 +15,7 @@ try{
  await page.screenshot({path:'test-results/single-title.png',fullPage:true});await page.locator('#newGame').click();
  for(const i of [1,3,2])await page.locator(`[data-hero="${i}"]`).click();
  if(await page.locator('.hero-card.selected').count()!==1)throw new Error('Hero selection allowed more than one hero');
- if(await page.locator('#missionStart option').count()!==19)throw new Error('Missing campaign missions');
+ if(await page.locator('#missionStart option').count()!==20)throw new Error('Missing campaign missions');
  await page.screenshot({path:'test-results/single-roster.png',fullPage:true});await page.locator('#begin').click();
  if(await page.evaluate(()=>thundercats.game.players.length!==1||thundercats.game.players[0].hero!==2))throw new Error('Campaign is not single-player');
  await page.keyboard.press('k');await page.waitForTimeout(130);if(await page.evaluate(()=>thundercats.game.players[0].z)<=0)throw new Error('On-foot jump failed');
@@ -23,7 +23,7 @@ try{
  if(!await page.evaluate(()=>!!thundercats.game.tank))throw new Error('Panthro lost the tank special');
  await page.screenshot({path:'test-results/single-panthro-tank.png',fullPage:true});
  const missions=[];
- for(const [index,vehicle,next] of [[1,'thundertank','forest'],[3,'thunderclaw','ruins'],[6,'feliner','canopy']]){
+ for(const [index,vehicle,next] of [[1,'thundertank','forest'],[3,'thunderclaw','tuskania-spillway'],[7,'feliner','canopy']]){
   await page.keyboard.press('Escape');await page.locator('#quit').click();await page.locator('#newGame').click();await page.selectOption('#missionStart',String(index));await page.locator('#begin').click();
   await page.waitForFunction(()=>thundercats.game.mode==='vehicle');await page.waitForTimeout(600);
   const before=await page.evaluate(()=>({x:thundercats.game.ship.x,scroll:thundercats.game.scroll}));

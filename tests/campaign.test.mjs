@@ -5,12 +5,34 @@ import {VehicleGame,VEHICLE_MISSIONS} from '../src/vehicle.js';
 import {Controls} from '../src/input.js';
 function step(g,seconds,input={}){for(let i=0;i<Math.ceil(seconds*60);i++)g.update(1/60,[input]);}
 test('the playable campaign always selects exactly one hero',()=>{const g=new Campaign({heroes:[2,0,1,3]});assert.equal(g.players.length,1);assert.equal(g.players[0].hero,2);});
-test('nineteen missions include twelve battles, six overhead routes and the Space Boards',()=>{assert.equal(CAMPAIGN.length,19);assert.equal(new Set(CAMPAIGN.map(m=>m.id)).size,19);assert.equal(CAMPAIGN.filter(m=>m.mode==='battle').length,12);assert.deepEqual(CAMPAIGN.filter(m=>m.mode==='vehicle').map(m=>m.vehicle),['thundertank','thunderclaw','feliner','thundertank','thunderclaw','feliner']);assert.equal(CAMPAIGN.at(-2).mode,'hoverboard');assert.equal(CAMPAIGN.at(-1).id,'pyramid');});
+test('twenty missions include the two Space Board chases in slots five and nineteen',()=>{
+ assert.equal(CAMPAIGN.length,20);
+ assert.equal(new Set(CAMPAIGN.map(m=>m.id)).size,20);
+ assert.equal(CAMPAIGN.filter(m=>m.mode==='battle').length,12);
+ assert.deepEqual(CAMPAIGN.filter(m=>m.mode==='vehicle').map(m=>m.vehicle),['thundertank','thunderclaw','feliner','thundertank','thunderclaw','feliner']);
+ assert.deepEqual(CAMPAIGN.flatMap((m,i)=>m.mode==='hoverboard'?[[i+1,m.id]]:[]),[[5,'tuskania-spillway'],[19,'berserker-coast']]);
+ assert.equal(CAMPAIGN[19].id,'pyramid');
+});
 test('mission changes preserve the chosen hero, score, health, charge and continues',()=>{const g=new Campaign({hero:2});g.active.score=700;g.players[0].hp=100;g.players[0].energy=61;g.players[0].lives=1;g.nextStage();assert.equal(g.active.mode,'vehicle');assert.equal(g.players.length,1);assert.equal(g.players[0].hero,2);assert.equal(g.players[0].hp,100);assert.equal(g.players[0].energy,61);assert.equal(g.players[0].lives,1);g.nextStage();assert.equal(g.active.stage.theme,'forest');assert.equal(g.score,700);assert.equal(g.players[0].lives,1);assert.equal(g.players[0].energy,61);});
-test('starting any vehicle mission uses the selected pilot and difficulty continues',()=>{for(const i of [1,3,6]){const g=new Campaign({stage:i,hero:3,difficulty:'hard'});assert.equal(g.players[0].hero,3);assert.equal(g.players[0].lives,2);}});
-test('all nineteen mission checkpoints restore by stable mission identity',()=>{for(let stage=0;stage<CAMPAIGN.length;stage++){const g=new Campaign({stage,hero:1});const save=g.snapshot();save.mission=100;const restored=Campaign.restore(save);assert.equal(restored.stage.id,g.stage.id);assert.equal(restored.players.length,1);assert.equal(restored.players[0].hero,1);}assert.throws(()=>Campaign.restore({version:3,missionId:'missing',hero:0}));});
+test('starting any vehicle mission uses the selected pilot and difficulty continues',()=>{for(const i of [1,3,7]){const g=new Campaign({stage:i,hero:3,difficulty:'hard'});assert.equal(g.players[0].hero,3);assert.equal(g.players[0].lives,2);}});
+test('all twenty mission checkpoints restore by stable mission identity',()=>{for(let stage=0;stage<CAMPAIGN.length;stage++){const g=new Campaign({stage,hero:1});const save=g.snapshot();save.mission=100;const restored=Campaign.restore(save);assert.equal(restored.stage.id,g.stage.id);assert.equal(restored.players.length,1);assert.equal(restored.players[0].hero,1);}assert.throws(()=>Campaign.restore({version:3,missionId:'missing',hero:0}));});
 test('old co-op saves migrate to one hero in the same ground chapter',()=>{const g=Campaign.restore({version:2,stageId:'desert',heroes:[3,2,0],difficulty:'normal',score:960,players:[{hp:100,lives:1,energy:70},{hp:100,lives:3}]});assert.equal(g.stage.id,'desert');assert.equal(g.players.length,1);assert.equal(g.hero,3);assert.equal(g.players[0].lives,1);assert.equal(g.players[0].energy,70);assert.equal(g.score,960);});
 test('completed chapter saves point at the next vehicle mission',()=>{const g=new Campaign();assert.equal(g.snapshot(true).missionId,'tank-run');assert.equal(Campaign.restore(g.snapshot(true)).active.mode,'vehicle');});
+test('Tuskania floodgates allow passage through the opening and hurt a board outside it',()=>{
+ const {active:g}=new Campaign({stage:4});
+ g.distance=g.stage.length/2;
+ step(g,1/60);
+ const [gate]=g.obstacles,p=g.board;
+ assert.equal(gate.kind,'gate');
+ gate.x=p.x;
+ p.y=gate.y;
+ p.invuln=0;
+ step(g,1/60);
+ assert.equal(p.hp,p.maxHp);
+ p.y=gate.y-gate.gap/2-20;
+ step(g,1/60);
+ assert.ok(p.hp<p.maxHp);
+});
 test('solo controls accept arrow keys, space, and a controller in a nonzero slot',()=>{const c=new Controls();c.keyDown('ArrowLeft');c.keyDown('Space');let i=c.sample(1,[],{single:true})[0];assert.equal(i.moveX,-1);assert.equal(i.attack,true);c.clear();const p={index:2,connected:true,axes:[.8,0],buttons:Array.from({length:17},(_,n)=>({pressed:n===2}))};i=c.sample(1,[null,null,p],{single:true})[0];assert.ok(i.moveX>0&&i.attack);});
 test('vehicle movement accelerates, brakes and stays inside every screen edge',()=>{const g=new VehicleGame();step(g,.4,{moveX:1});assert.ok(g.ship.x>550);const before=g.ship.x;step(g,.15);assert.ok(g.ship.x-before<20);step(g,5,{moveX:1,moveY:1});assert.ok(g.ship.x<890&&g.ship.y<=470);step(g,5,{moveX:-1,moveY:-1});assert.ok(g.ship.x>70&&g.ship.y>=145);});
 test('holding fire damages enemies ahead, credits kills and charges the weapon',()=>{const g=new VehicleGame();g.nextWave=Infinity;g.nextHazard=Infinity;const e=g.spawn('nosediver',480,220);e.baseX=480;e.fireCd=99;step(g,1.2,{attack:true});assert.ok(e.hp<e.maxHp);assert.ok(g.ship.energy>0);assert.ok(g.score>0);});

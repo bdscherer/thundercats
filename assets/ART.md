@@ -78,3 +78,7 @@ ImageGen created the [Space Board rider sheet](spaceboard-riders.png), [coastal 
 
 - The twins’ faces and costumes follow an [original animation cel](https://thundercats.org/animation-art/community-wilykat-wilykit/) and the [Iron Studios design references](https://thundercats.org/collecting/statues/iron-studios-wilykit-wilykat/).
 - Hammerhand’s appearance follows the [original-series character archive](https://thundercats.org/encyclopedia/characters/hammerhand/). The [original episode](https://thundercats.org/cartoons/1985/episodes/the-terror-of-hammerhand/) inspired the pirate ship encounter.
+
+## Tuskania Spillway
+
+The [spillway panorama](tuskania-spillway.png) and [Giant Technopede sprite](giant-technopede.png) were generated for Mission 5, using original animation frames for the robot’s armor, legs, and face. The Space Board chase and floodgate layout are adaptations for this mission. [Original episode and screen captures](https://thundercats.org/cartoons/1985/episodes/turmagar-the-tuska/) · [Generation prompts](tuskania-spillway.prompts.json)

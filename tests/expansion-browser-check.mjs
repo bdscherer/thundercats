@@ -16,7 +16,7 @@ try{
  await page.addInitScript(()=>{window.__pads=[];Object.defineProperty(navigator,'getGamepads',{value:()=>window.__pads});});
  page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)errors.push(r.status()+' '+r.url());});await fs.mkdir(out,{recursive:true});await page.goto('http://127.0.0.1:'+port);
  await page.waitForFunction(()=>window.thundercats&&Object.values(thundercats.renderer.animations).every(b=>b.ready)&&thundercats.vehicleRenderer.terrain.naturalWidth>0);
- await page.locator('#newGame').click();assert.equal(await page.locator('#missionStart option').count(),19);await page.locator('#begin').click();
+ await page.locator('#newGame').click();assert.equal(await page.locator('#missionStart option').count(),20);await page.locator('#begin').click();
  await page.evaluate(()=>{const g=thundercats.game,p=g.players[0];g.completed=new Set([0,1]);g.banner=0;g.props=[];p.hp=p.maxHp*.6;p.energy=42;});
  const switches=[];
  for(const [key,hero] of [['2',1],['3',2],['q',1],['e',2]]){await page.keyboard.press(key);await page.waitForFunction(hero=>thundercats.campaign.hero===hero,hero);switches.push(hero);await page.waitForTimeout(800);}
@@ -24,7 +24,7 @@ try{
  await page.evaluate(()=>{window.__pads=[null,null,{index:2,connected:true,axes:[0,0],buttons:Array.from({length:17},(_,i)=>({pressed:i===5}))}];});await page.waitForFunction(()=>thundercats.campaign.hero===0);await page.evaluate(()=>window.__pads=[]);
  const shared=await page.evaluate(()=>{const p=thundercats.game.players[0];return {ratio:p.hp/p.maxHp,energy:p.energy,players:thundercats.game.players.length};});assert.ok(Math.abs(shared.ratio-.6)<1e-8);assert.equal(shared.energy,42);assert.equal(shared.players,1);
  await page.screenshot({path:path.join(out,'expansion-switching.png')});const missions=[];
- for(let index=7;index<=16;index++){
+ for(let index=8;index<=17;index++){
   const state=await page.evaluate(index=>{const c=thundercats.campaign;c.loadMission(index);const g=c.active;g.banner=0;
    if(g.mode==='battle'){g.props=[];g.completed=new Set(g.encounterGates.map((_,i)=>i).filter(i=>i!==g.bossEncounter));const gate=g.encounterGates.at(-1);g.camera=g.prevCamera=gate-220;Object.assign(g.players[0],{x:gate+80,prevX:gate+80,y:415,prevY:415,invuln:999});g.beginEncounter(g.bossEncounter);for(const e of g.enemies.filter(e=>e.boss))Object.assign(e,{phase:1,hp:e.maxHp*.55,action:'telegraph',timer:4,attackKind:e.type==='monkian'?'rockfall':e.type==='mummra'?'hex':'rush'});}
    else{g.enemies=[];g.nextWave=g.nextHazard=Infinity;g.bossStarted=true;g.distance=g.prevDistance=g.stage.length-900;g.ship.invuln=999;const e=g.spawn(g.stage.bossType,480,155,true);e.phase=1;e.hp=e.maxHp*.55;e.fireCd=5;}

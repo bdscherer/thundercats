@@ -9,7 +9,7 @@ const assetNames=[
  ...['slythe','monkian','jackalman','mummra'].map(n=>'boss-'+n+'-1985.png'),
  ...['lair','forest','ruins','desert','pyramid'].map(n=>n+'-hd.png'),
  'vehicle-heroes-topdown.png','vehicle-enemies-topdown.png','vehicle-terrain-topdown-v2.png','expedition-worlds-a.png','expedition-worlds-b.png', ...['a','b','c','d'].map(id=>'boss-roster-'+id+'.png'), 'boss-vehicles-1985.png',
- 'spaceboard-riders.png','berserker-coast.png','hammerhand-gunboat.png'
+ 'spaceboard-riders.png','berserker-coast.png','hammerhand-gunboat.png','tuskania-spillway.png','giant-technopede.png'
 ];
 await fs.mkdir(path.join(out,'src'),{recursive:true});await fs.mkdir(path.join(out,'assets'),{recursive:true});
 for(const name of sourceNames)await fs.copyFile(path.join(root,'src',name),path.join(out,'src',name));

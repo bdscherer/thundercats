@@ -24,7 +24,8 @@ function hoverboardInput(g){
  const enemy=boss||g.enemies.find(e=>e.x>p.x+80&&e.x<800);
  let targetY=enemy?.y??272;
  const rock=g.obstacles.find(o=>o.x>p.x-70&&o.x<p.x+170);
- if(rock)targetY=rock.bottom?Math.min(targetY,rock.y-45):Math.max(targetY,rock.y+45);
+ if(rock?.kind==='gate')targetY=rock.y;
+ else if(rock)targetY=rock.bottom?Math.min(targetY,rock.y-45):Math.max(targetY,rock.y+45);
  const warning=boss?.warning;
  if(warning){
   const lanes=warning.lanes||[warning.y];
