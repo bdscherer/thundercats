@@ -1,10 +1,11 @@
+import {VEHICLE_VILLAINS} from './bosses.js';
 import {Game} from './game.js';
 import {HEROES,STAGES,EXTRA_STAGES,DIFFICULTIES,clamp} from './data.js';
 import {VehicleGame,VEHICLE_MISSIONS,EXTRA_VEHICLE_MISSIONS} from './vehicle.js';
 export const CAMPAIGN=[
  {id:'lair',ground:0},VEHICLE_MISSIONS[0],{id:'forest',ground:1},VEHICLE_MISSIONS[1],{id:'ruins',ground:2},{id:'desert',ground:3},VEHICLE_MISSIONS[2],
  EXTRA_STAGES[0],EXTRA_STAGES[1],EXTRA_VEHICLE_MISSIONS[0],EXTRA_STAGES[2],EXTRA_STAGES[3],EXTRA_VEHICLE_MISSIONS[1],EXTRA_STAGES[4],EXTRA_STAGES[5],EXTRA_VEHICLE_MISSIONS[2],EXTRA_STAGES[6],{id:'pyramid',ground:4}
-].map(m=>m.ground===undefined?m:{...STAGES[m.ground],...m,mode:'battle'});
+].map(m=>{const stage=m.ground===undefined?m:{...STAGES[m.ground],...m,mode:'battle'};return {...stage,villains:stage.mode==='vehicle'?[VEHICLE_VILLAINS[stage.bossType].id]:[stage.bossType,stage.bossPair].filter(Boolean)};});
 export class Campaign{
  constructor({heroes=[0],hero=heroes[0],difficulty='normal',stage=0,onEvent=()=>{},pilot,score=0,kills=0,time=0,bestCombo=0}={}){
   this.hero=Number.isInteger(hero)&&HEROES[hero]?hero:0;this.difficulty=difficulty;this.onEvent=onEvent;this.switchCooldown=0;

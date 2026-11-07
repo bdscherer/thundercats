@@ -1,9 +1,9 @@
 {
-  "builtAt": "2026-11-07T02:08:35.580Z",
+  "builtAt": "2026-11-07T20:15:01.774Z",
   "entry": "index.html",
   "standalone": "standalone.html",
-  "standaloneBytes": 73299224,
-  "runtimeAssets": 26,
+  "standaloneBytes": 86082338,
+  "runtimeAssets": 31,
   "files": [
     {
       "path": "index.html",
@@ -22,8 +22,8 @@
     },
     {
       "path": "standalone.html",
-      "bytes": 73299224,
-      "sha256": "4c6103664cb4ffebabab843fea4cc8d618451bbf12f4cfd0cb7d6f0e5dd6cb52"
+      "bytes": 86082338,
+      "sha256": "41fc82c5cf6dab660c87522dd50e7bd5c61a6cf79fce98037ce928e905d6d2ba"
     },
     {
       "path": "src/main.js",
@@ -32,28 +32,28 @@
     },
     {
       "path": "src/campaign.js",
-      "bytes": 5448,
-      "sha256": "aa7603283b4397e80e1a5daa24cf02804f502800527bde7288e17432e2fbd36d"
+      "bytes": 5645,
+      "sha256": "1ba52e34031ed8b942e69f7987023c02e82afdc14d25b4b7bf86f84697a27593"
     },
     {
       "path": "src/game.js",
-      "bytes": 39628,
-      "sha256": "bdba0056abcb98854fd6271d7a7c09212448a763a1b918700f14e644ac3891b7"
+      "bytes": 41424,
+      "sha256": "86b1a6ffef79c900642dcfc70a82f42e7e0cf42f7fd5a1c0bc2eed76355ea666"
     },
     {
       "path": "src/vehicle.js",
-      "bytes": 14220,
-      "sha256": "544358cc3f20425dc157792c0b803c21126cad4fc067e61c9d8b350ab1e317fd"
+      "bytes": 15026,
+      "sha256": "1b1b50fbc07b958c6450634b6a114b58027339d049ee2ec5db22c0ad517bbfc1"
     },
     {
       "path": "src/vehicle-art.js",
-      "bytes": 9983,
-      "sha256": "8a23675d4b90b79f896d5800f467496d6d4995c00b3727977c93bc8cb5811478"
+      "bytes": 11049,
+      "sha256": "1c69d516772a464a88187e16a0737db39ec59131a79e15f8cde460862cdd94a0"
     },
     {
       "path": "src/art.js",
-      "bytes": 65038,
-      "sha256": "aebef3eb7146ecab2bd3e95f70bd00714a77c3329fdb96bfc3312273bf975eaa"
+      "bytes": 66181,
+      "sha256": "dca4ddc6d7accee95a9a68a50747a4d856a8f4995bc61d254a91b52c6423e3ff"
     },
     {
       "path": "src/audio.js",
@@ -72,8 +72,13 @@
     },
     {
       "path": "src/data.js",
-      "bytes": 15988,
-      "sha256": "6e4f89695097cb494cd58ac554fd7c7073763a36dff2637c5af25c302b8b4e99"
+      "bytes": 15934,
+      "sha256": "4f6b936081e30d29e79c9cf42cf6f4cc3b3810783a63f635962703b6d3980f53"
+    },
+    {
+      "path": "src/bosses.js",
+      "bytes": 2525,
+      "sha256": "d3767086627d03bb17920f79bd35550662753584e4a1595f8570fb8e65b0c5fe"
     },
     {
       "path": "assets/thundercats-emblem.png",
@@ -204,6 +209,31 @@
       "path": "assets/expedition-worlds-b.png",
       "bytes": 3595986,
       "sha256": "d9859e67446e3cd6d7d45a8f059979cd34559fcbc70dcf8915efb5650ec8016e"
+    },
+    {
+      "path": "assets/boss-roster-a.png",
+      "bytes": 1898533,
+      "sha256": "52855c623bf971e2cabeaab54ee28e4254c36629404d697e0e112d8e73a94909"
+    },
+    {
+      "path": "assets/boss-roster-b.png",
+      "bytes": 1673709,
+      "sha256": "ad5faa890b75dbd302e4dcaa68baef709d430d8e209eed9402bc8d778883e581"
+    },
+    {
+      "path": "assets/boss-roster-c.png",
+      "bytes": 2173761,
+      "sha256": "4d4483307e9873de09d4d9cf4338cad862106d8e5b72b444108009086aa4e8a4"
+    },
+    {
+      "path": "assets/boss-roster-d.png",
+      "bytes": 2029301,
+      "sha256": "e3410619a71480c87116a718a21a60a5df139ca0347602333ba56b4d83263bb6"
+    },
+    {
+      "path": "assets/boss-vehicles-1985.png",
+      "bytes": 1806178,
+      "sha256": "2842c24a7455389b1441ac62c10b67132b2777001c359368c37b5eddb6700b1a"
     }
   ]
 }

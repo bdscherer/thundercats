@@ -60,3 +60,14 @@ This is an unofficial playable fan project with newly generated interpretations 
 `expedition-worlds-a.png` and `expedition-worlds-b.png` were created with the built-in image-generation tool, using `forest-hd.png` only as a reference for the established inked cartoon style. Each is a borderless 2×2 landscape atlas. A contains canopy bridges, frozen pass, volcanic mountain and swamp; B contains Plun-Darr fortress, industrial foundry, astral gate and a reserved coastal scene. The renderer crops each cell with an inset to avoid sampling adjacent scenes, overlaps scrolling tiles with feathered edges, and fades the newly loaded art in. The two atlases load on demand in the normal hosted version.
 
 Full prompts: [expedition-worlds.prompts.json](expedition-worlds.prompts.json). Final assets: [atlas A](expedition-worlds-a.png), [atlas B](expedition-worlds-b.png). Snow, embers, fog, conveyor belts, hazard warnings and phase effects are canvas graphics layered over the illustrated environments.
+
+## Distinct villain roster
+
+New ImageGen sprite sheets contain ready, attack and recoil poses for [Grune, Safari Joe and Red-Eye](boss-roster-a.png), [Chilla, the Demolisher and the Mad Bubbler](boss-roster-b.png), [Luna, Amok and Driller](boss-roster-c.png), and [Shadowmaster and Zaxx](boss-roster-d.png). The [vehicle sheet](boss-vehicles-1985.png) shows the Luna Tacker, Skytomb and Vertus from above. Skytomb and the Vertus are game interpretations for the top-down routes. See [generation prompts](villain-roster.prompts.json).
+
+- The [original-series character archive](https://thundercats.org/encyclopedia/characters/) supplied character designs and biographies; the [Mad Bubbler prototype](https://thundercats.org/toys/ljn-prototype-mad-bubbler/) supplied an additional design reference.
+- The [original animation cel](https://thundercats.org/animation-art/shadowmaster-mumm-ra/) and [Zaxx character reference](https://thundercats.org/encyclopedia/characters/zaxx/) informed the Astral Gate duo.
+- [Tug-Mug’s gravity carbine](https://thundercats.org/encyclopedia/characters/tugmug/), the [Luna Tacker catalog scan](https://thundercats.org/toys/ljn-prototype-luna-tacker/), and the [Lunataks episode](https://thundercats.org/cartoons/1985/episodes/mumm-ra-lives-part-iii/) informed the Luna Tacker and Skytomb encounters.
+- [Captain Shiner’s original episode](https://thundercats.org/cartoons/1985/episodes/sword-in-a-hole/) identifies his ship and crew. The [Skycutter archive](https://thundercats.org/encyclopedia/vehicles/skycutter/) identifies Vultureman as one of its original pilots.
+
+The mission settings, pairings and attack patterns are adaptations for the game. The illustrated boss sheets load when their missions begin.

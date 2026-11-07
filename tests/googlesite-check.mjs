@@ -70,9 +70,40 @@ try{
    const bosses=await frame.evaluate(()=>{const g=thundercats.game;g.beginEncounter(g.bossEncounter);return g.enemies.filter(e=>e.boss).length;});assert.equal(bosses,id==='canopy'?1:2);expeditions.push(id);
    await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
   }
+  await frame.selectOption('#missionStart','0');await frame.locator('#begin').click();
+  const villains=[];
+  for(let index=0;index<18;index++){
+   const state=await frame.evaluate(index=>{
+    const {campaign,renderer}=thundercats;campaign.loadMission(index);const g=campaign.active;
+    g.banner=0;g.texts=[];
+    if(g.mode==='battle'){
+     const gate=g.encounterGates.at(-1);g.camera=g.prevCamera=gate-220;g.props=[];
+     Object.assign(g.players[0],{x:gate+80,prevX:gate+80,y:415,prevY:415,invuln:99});
+     g.beginEncounter(g.bossEncounter);
+     g.enemies=g.enemies.filter(e=>e.boss);
+     for(const e of g.enemies){Object.assign(e,{action:'spawn',timer:99});renderer.bossBank(e.type);}
+     renderer.bossFrames={};
+    }else{
+     g.nextWave=g.nextHazard=Infinity;g.distance=g.stage.length-901;g.update(1/60,[{}]);g.ship.invuln=99;
+     for(const e of g.enemies.filter(e=>e.boss))Object.assign(e,{y:155,prevY:155,fireCd:99});
+    }
+    return {id:g.stage.id,bosses:g.enemies.filter(e=>e.boss).map(e=>e.villain),expected:g.stage.villains};
+   },index);
+   assert.deepEqual(state.bosses,state.expected,state.id);villains.push(...state.bosses);
+   await frame.waitForFunction(()=>{
+    const {game:g,renderer:r,vehicleRenderer:v}=thundercats;
+    return g.enemies.filter(e=>e.boss).every(e=>g.mode==='battle'?r.bossBank(e.type)?.ready&&r.bossFrames?.[e.type]:e.bossArt===undefined?r.animations.vehicleEnemies.ready:v.bossBank().ready&&v.bossBank().frames.has(e.bossArt));
+   },{},{timeout:12000}).catch(async error=>{
+    const banks=await frame.evaluate(()=>Object.fromEntries(Object.entries(thundercats.renderer.animations).filter(([k])=>k.startsWith('boss-')||k.startsWith('vehicle')).map(([k,b])=>[k,{ready:b.ready,frames:[...b.frames.keys()]}])));
+    throw new Error('Boss artwork did not render: '+state.id+' '+JSON.stringify(banks),{cause:error});
+   });
+   if(!standalone&&['ruins','snow-pass','plundarr','astral-gate','feliner-deep'].includes(state.id))await frame.locator('#game').screenshot({path:path.join(root,'test-results','villain-'+state.id+'.png')});
+  }
+  assert.equal(villains.length,20);assert.equal(new Set(villains).size,20);
+  await page.keyboard.press('Escape');await frame.locator('#quit').click();await frame.locator('#newGame').click();
   if(!standalone){await page.setViewportSize({width:740,height:720});await page.screenshot({path:path.join(root,'test-results','googlesite-mobile.png')});const fit=await frame.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1);assert.equal(fit,true,'Horizontal overflow inside iframe');}
   if(standalone)assert.ok(requests.every(url=>url===base+'/googlesite/standalone.html'),'Standalone loaded external files: '+requests.map(s=>s.slice(0,140)).join(', '));
-  assert.deepEqual(errors,[]);report.checks.push({name:standalone?'Standalone HTML in opaque sandbox, no storage or gamepad permission':'Hosted subdirectory in cross-origin sandbox with gamepad denied',restrictions,backgroundTransition,pitReturn,routes,expeditions,heroSwitching:true,externalRequests:standalone?requests.length:undefined,passed:true});
+  assert.deepEqual(errors,[]);report.checks.push({name:standalone?'Standalone HTML in opaque sandbox, no storage or gamepad permission':'Hosted subdirectory in cross-origin sandbox with gamepad denied',restrictions,backgroundTransition,pitReturn,routes,expeditions,villains,heroSwitching:true,externalRequests:standalone?requests.length:undefined,passed:true});
   await context.close();
  }
  report.passed=true;await fs.writeFile(path.join(out,'TEST-RESULTS.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report));

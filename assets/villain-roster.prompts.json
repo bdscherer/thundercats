@@ -1,0 +1,41 @@
+[
+  {
+    "asset": "boss-roster-a.png",
+    "prompt": "Produce a transparent PNG game sprite atlas, exactly THREE rows and THREE columns of isolated FULL-BODY figures, centered in nine equal grid cells, obvious empty gutters and no overlap or text. Each row is the SAME character in these three poses: left cell combat-ready, center cell attacking toward the RIGHT, right cell recoiling from a hit. All face RIGHT, entirely inside their own cell, keep all limbs and weapons readable. Inputs 1–3 are identity references for rows 1–3, input 4 is existing game art STYLE only. Classic 1985 Rankin/Bass cartoon designs only. HD clean dark ink contours, cel-shading, expressive and muscular illustrated arcade style, matching the game. No scene, floor, FX debris, detached weapons, gradients outside silhouette, duplicate limbs, labels, or shadows. True alpha. Row 1 Grune the Destroyer: brown broad saber-tooth Thunderian with ONE long surviving fang, brown mane, round-studded headband, silver spiked shoulder armor, tan chest armor, wield his heavy spiked Thundrainium MACE, never Sword of Omens from reference. Row 2 Safari Joe: recognizable human big-game hunter, pith helmet and safari clothing from reference, holding his science-fiction hunting rifle, strong clean silhouette. Row 3 Red-Eye: bulky masked red-and-violet Lunatak with luminous eye visor and chest-mounted throwing disc, show one disc in his hand during attack.",
+    "references": [
+      "grune.jpg",
+      "safari.webp",
+      "redeye.webp"
+    ]
+  },
+  {
+    "asset": "boss-roster-b.png",
+    "prompt": "Produce a transparent PNG game sprite atlas, exactly THREE rows and THREE columns of isolated FULL-BODY figures, centered in nine equal grid cells, obvious empty gutters and no overlap or text. Each row is the SAME character in these three poses: left cell combat-ready, center cell attacking toward the RIGHT, right cell recoiling from a hit. All face RIGHT, entirely inside their own cell, keep all limbs and weapons readable. Inputs 1–3 are identity references for rows 1–3, input 4 is existing game art STYLE only. Classic 1985 Rankin/Bass cartoon designs only. HD clean dark ink contours, cel-shading, expressive and muscular illustrated arcade style, matching the game. No scene, floor, FX debris, detached weapons, gradients outside silhouette, duplicate limbs, labels, or shadows. True alpha. Row 1 Chilla: the icy Lunatak woman, exact classic face, gray-blue skin, silver hair, red-and-blue costume from reference, cold breath pose. Row 2 the Demolisher: the original muscular canine gladiator, armor and head from the cartoon reference, towering shoulders, power gauntlets, no sword. Row 3 the Mad Bubbler: squat wide-mouthed orange scaly amphibian spirit, big red eyes, bright blue mouth markings and pale blue ribbed belly as on the vintage toy reference; translate to flat cartoon ink, no photo backdrop or watermark, cheeks puffed in attacking pose.",
+    "references": [
+      "chilla.webp",
+      "demolisher.webp",
+      "bubbler.webp"
+    ]
+  },
+  {
+    "asset": "boss-roster-c.png",
+    "prompt": "Produce a transparent PNG game sprite atlas, exactly THREE rows and THREE columns of isolated FULL-BODY figures, centered in nine equal grid cells, obvious empty gutters and no overlap or text. Each row is the SAME character in these three poses: left cell combat-ready, center cell attacking toward the RIGHT, right cell recoiling from a hit. All face RIGHT, entirely inside their own cell, keep all limbs and weapons readable. Inputs 1–3 are identity references for rows 1–3, input 4 is existing game art STYLE only. Classic 1985 Rankin/Bass cartoon designs only. HD clean dark ink contours, cel-shading, expressive and muscular illustrated arcade style, matching the game. No scene, floor, FX debris, detached weapons, gradients outside silhouette, duplicate limbs, labels, or shadows. True alpha. Row 1 Luna: tiny wizened pale pink Lunatak leader in black bodysuit with gold sash, pale blue gloves and boots; independent full body, raised fist and commanding gesture, no Amok in this row. Row 2 Amok: Luna's huge hunched shaggy orange-brown ape-like bodyguard as in cartoon reference, huge forearms, beast face, stomping attack, no rider in this row. Row 3 Driller: exact cartoon pale metal humanoid robot with a huge screw-drill cone for its entire lower body, head and arms as shown in reference, no legs, attack lunges with arm or auger.",
+    "references": [
+      "luna.webp",
+      "amok.webp",
+      "driller.webp"
+    ]
+  },
+  {
+    "asset": "boss-roster-d.png",
+    "prompt": "Transparent PNG sprite sheet for a hand-drawn, colorful, family-friendly 2D fantasy arcade game. Exactly six isolated full-body sprites arranged as TWO ROWS and THREE COLUMNS, generous transparent padding between every figure. All face right. Top row: the Shadowmaster from the 1980s ThunderCats cartoon, a mysterious wizard wearing full-length dark blue robes and a cape, shadowed hood, violet eyes and two bright magenta trim lines. Bottom row: Zaxx from the same cartoon, an armored bird-headed sorcerer with a long curved ibis beak, dark violet feathers, gold breastplate over a fully clothed navy costume, four arms and a small bright violet medallion. Each row shows the same design three times: ready at left, gesturing a spell to the right at center, and recoiling at right. Bold clean inked contours, hand-painted cel shading, saturated palette, crisp silhouettes. No captions, no logos, no backdrop, no tiles, no added effects behind the silhouettes, no dropped shadows. Do not crop any part of any character."
+  },
+  {
+    "asset": "boss-vehicles-1985.png",
+    "prompt": "Produce a transparent top-down arcade boss vehicle PNG sprite atlas, wide horizontal THREE equal columns, ONE row. Exactly one fully isolated complete vehicle centered in each cell, no clutter, labels, shadows, terrain, text, extra vehicles or thruster trails. All are nose toward BOTTOM of the canvas; overhead view with slight depth like the second image, exact clean bold cel-shaded comic ink. Cell 1 Luna Tacker of classic 1987 ThunderCats, from reference 1: dark charcoal and violet armored mechanical beast walker, long pointed articulated animal head with purple teeth and eyes, four clawed side legs and exposed rear pilot station. Retain the recognizable chassis but no catalogue background or letters. Cell 2 Skytomb, a full massive floating Lunatak fortress with slate-violet rocky armor base, dark crenellated towers, thick angular metal undercarriage, orange-red weapon ports and one large violet mind-control emitter on its nose. Cell 3 Captain Shiner's massive Vertus mercenary space cruiser inspired by the original 1985 Sword in a Hole, elongated steel-blue armored spaceship, squat bridge module, broad symmetric nacelles, oversized triple forward laser emitters and gold window strips, military rather than flying saucer. Very different silhouettes. Match source 2 STYLE, not its specific vehicle designs. True alpha.",
+    "references": [
+      "tacker.webp",
+      "vehicle-enemies-topdown.png"
+    ]
+  }
+]

@@ -20,30 +20,30 @@ For another device on the same network, use the **Network** address printed in t
 
 ## Eighteen missions
 
-| Mission | Play style | Goal |
+| Mission | Boss | Signature threat |
 | --- | --- | --- |
-| 01 · Cat’s Lair | Side-scrolling combat | Defend the terraces and defeat Jackalman. |
-| 02 · Thundertank: Canyon Run | Top-down driving, vertical scrolling | Cross the canyon and minefield; destroy the Fistpounder blockade. |
-| 03 · Whispering Forest | Side-scrolling combat | Survive the poison bog and defeat Slithe. |
-| 04 · ThunderClaw: Sky Chase | Top-down flight, vertical scrolling | Fly over Third Earth and defeat the Skycutter commander. |
-| 05 · Lost City | Side-scrolling combat | Cross the aqueduct and guardian plaza; defeat Monkian. |
-| 06 · Burning Sands | Side-scrolling combat | Survive the bone canyon and defeat Jackalman. |
-| 07 · Feliner: Orbital Assault | Top-down space flight, vertical scrolling | Cross the asteroid belt and intercept Ratar-O’s Ratstar. |
-| 08 · Treetop Heights | Canopy bridges | Wind, bomber ambushes and Monkian’s rockfalls. |
-| 09 · Snowman’s Pass | Frozen mountain combat | Slippery ice, frost vents and Slithe’s siege. |
-| 10 · Thundertank: Glacier Run | Top-down driving | Ice handling, mines and an upgraded Fistpounder. |
-| 11 · Fire Rock Mountain | Volcanic combat | Warned eruptions, lava bridges and Jackalman’s bombardment. |
-| 12 · River of Despair | Swamp combat | Slow mud lanes, poison surges and Slithe. |
-| 13 · ThunderClaw: Tempest Strike | Top-down flight | Crosswinds, marked lightning and Skycutter crossfire. |
-| 14 · Castle Plun-Darr | Fortress assault | Artillery and a Jackalman/Monkian duo battle. |
-| 15 · Mutant Foundry | Industrial combat | Moving conveyors, steam vents and Monkian. |
-| 16 · Feliner: Deep Space | Top-down space flight | Nebula debris and the Ratstar dreadnought. |
-| 17 · Astral Gate | Spirit temple combat | Marked spirit circles and Slithe/Jackalman together. |
-| 18 · Black Pyramid | Final side-scrolling battle | Defeat Mumm-Ra the Ever-Living. |
+| 01 · Cat’s Lair | Jackalman | Rushes and bombardment across the terraces. |
+| 02 · Thundertank: Canyon Run | Monkian · Fistpounder | Cannon spreads and mine drops. |
+| 03 · Whispering Forest | Slithe | Venom pools, cleaves and charges. |
+| 04 · ThunderClaw: Sky Chase | Vultureman · Skycutter | Crossfire from both wings. |
+| 05 · Lost City | Grune the Destroyer | Mace strikes send fault lines across the plaza. |
+| 06 · Burning Sands | Safari Joe | Rifle spreads and snares that slow the hero. |
+| 07 · Feliner: Orbital Assault | Ratar-O · Ratstar | Wide orbital volleys and fighter escorts. |
+| 08 · Treetop Heights | Red-Eye | Thrown discs double back across canopy bridges. |
+| 09 · Snowman’s Pass | Chilla | Frost bursts slow movement on the ice. |
+| 10 · Thundertank: Glacier Run | Tug-Mug · Luna Tacker | Slow volleys and marked gravity blasts. |
+| 11 · Fire Rock Mountain | The Demolisher | Lunging uppercuts and shockwaves. |
+| 12 · River of Despair | The Mad Bubbler | Drifting bubble volleys and poison zones. |
+| 13 · ThunderClaw: Tempest Strike | Alluro · Skytomb | Psychic bursts overlap the storm’s lightning. |
+| 14 · Castle Plun-Darr | Luna and Amok | Luna commands Amok, who pounces across the arena. |
+| 15 · Mutant Foundry | Driller | Tunnels under the hero and leaves delayed eruptions. |
+| 16 · Feliner: Deep Space | Captain Shiner · Vertus | Charged lasers sweep an entire marked column. |
+| 17 · Astral Gate | Shadowmaster and Zaxx | Crossing shadow rifts and medallion volleys. |
+| 18 · Black Pyramid | Mumm-Ra the Ever-Living | Spirit patterns, reinforcements and teleportation. |
 
 Seven new illustrated environments are packed into two background atlases and loaded when first needed. They retain the soft scenery joins and gradual section lighting. Each new ground mission has four areas with its own floor material, weather or movement mechanic, encounter formations, and a final boss arena.
 
-Bosses now have three health phases, larger on-screen models, clearly marked attack windups, recovery windows, and distinct cycles: Slithe mixes venom, cleaves and charges; Monkian uses slams and falling rocks; Jackalman combines rushes, spreads and bombardment; Mumm-Ra uses spirit patterns, reinforcements and teleportation. Duo bosses stagger their windups and have separate phase bars. Vehicle bosses also change movement and fire patterns across three phases, with mines or escorts in later phases.
+The campaign features 20 original-series villains in 18 encounters. No villain appears as a boss twice. Bosses have three health phases, marked windups and recovery windows. Duo bosses stagger their windups and have separate phase bars. The [art and research notes](assets/ART.md#distinct-villain-roster) document the cartoon references and game-specific adaptations.
 
 Switch with **1–4**, **Q/E**, **Tab**, **RB/R1**, or the on-screen roster. Health percentage, special charge, score and continues carry across heroes; changing pilots leaves vehicle hull and weapons intact. Switching has a 0.75-second cooldown and a 1.2-second input buffer for attack recovery. It does not cancel hurt, jumps, falls or active summon sequences. Saves preserve the selected hero and stable mission identity; older final-pyramid checkpoints still load the final pyramid.
 
@@ -98,7 +98,7 @@ npm run test:campaign
 npm run test:vehicles
 ```
 
-The 105 unit tests cover combat, input, legacy-engine compatibility, all eighteen checkpoint identities, old-save migration, hero switching and its locks/buffer, phase transitions, paired bosses, environment hazards, steering, weapon charging, boosts, hull damage, route bosses, transitions, and hole falls. Retained multiplayer engine fixtures exercise backward compatibility; the playable campaign always creates one active hero.
+The 108 unit tests cover combat, input, checkpoint migration, hero switching, phase transitions, the distinct boss roster and signature attacks, environment hazards, vehicle handling, transitions, and hole falls. Retained multiplayer engine fixtures exercise backward compatibility; the playable campaign always creates one active hero.
 
 Holes have cracked, perspective rims with matching foot collision. Walking or landing inside plays a fall animation, removes 22% of maximum health (rounded up), and returns the hero to nearby safe ground. The hero blinks and has damage protection for one second after returning, with movement immediately available. Jump over openings or walk around them; guard, dodge and invisibility cannot prevent a fall. Lion-O uses a separate corrected eight-frame run sheet with one sword and one claw shield.
 
@@ -106,7 +106,7 @@ Holes have cracked, perspective rims with matching foot collision. Walking or la
 
 Scenery tiles overlap with soft edges, including the Cat’s Lair-to-forest transition and vertical vehicle terrain. Ground-section colors and lighting blend over 640 world pixels, with paving and cracks staying aligned. Vehicle section shading also changes gradually. `npm run test:backgrounds` starts its own server and checks section transitions, scenery coverage, the lair edge, and vehicle terrain wraps in Chromium; screenshots and measurements are saved in `test-results/`.
 
-The full campaign simulation completes all eighteen missions as Lion-O and Panthro without extra health or invulnerability. `node tests/arcade-playtest.mjs 0 --switch` also completes a run while repeatedly changing heroes. The vehicle simulation separately completes all six Arcade routes. The fixed-Cheetara bot lost at the Plun-Darr duo encounter; these simulations validate completion paths rather than guarantee identical difficulty for every hero.
+The campaign simulation exercises the full Arcade progression without extra health or invulnerability. Run it with `0` for Lion-O, `2` for Panthro, or `0 --switch` to switch heroes during play. The vehicle simulation separately exercises all six Arcade routes.
 
 After starting the server, browser verification uses the optional development dependencies:
 

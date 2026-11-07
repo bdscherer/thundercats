@@ -1,6 +1,6 @@
 # Google Sites embed package
 
-This directory is a self-contained export of the single-player ThunderCats game. It includes all eighteen missions and all 26 runtime artwork assets, including Lion-O's corrected run animation. It does not need the parent project's files, Node.js or npm after hosting.
+This directory is a self-contained export of the single-player ThunderCats game. It includes eighteen missions, 20 distinct boss villains, and 31 runtime artwork assets. It does not need the parent project's files, Node.js or npm after hosting.
 
 Backgrounds use soft scenery overlaps and gradual ground/lighting changes between sections. The Cat’s Lair blends into the forest, and vehicle terrain blends at its vertical joins.
 
@@ -19,7 +19,7 @@ The snippet is a template: its `.example` URL is deliberately not a live website
 
 [standalone.html](standalone.html) includes the complete game code, styles, and embedded PNG artwork. It runs without requesting additional scripts, images or fonts. It can be hosted as one HTML file or opened locally for an offline preview.
 
-Google Sites accepts HTML, CSS and JavaScript through Embed code, so this file contains the full pasteable code. However, it is approximately **70 MiB** because of the game's HD artwork. Direct paste acceptance and saving at that size have **not** been verified in the Google Sites editor; the small hosted iframe snippet above is recommended. Do not paste only a portion of the standalone file.
+Google Sites accepts HTML, CSS and JavaScript through Embed code, so this file contains the full pasteable code. However, it is approximately **82 MiB** because of the game's HD artwork. Direct paste acceptance and saving at that size have **not** been verified in the Google Sites editor; the small hosted iframe snippet above is recommended. Do not paste only a portion of the standalone file.
 
 In an opaque sandbox, browser storage is unavailable: the game still plays, but saves and settings cannot persist there. Prefer the hosted URL for normal browser-local saving. Browser policies may also limit storage in third-party embeds.
 
@@ -37,11 +37,12 @@ Open `http://localhost:4173/googlesite/embed-preview.html` to test the iframe, o
 
 [TEST-RESULTS.json](TEST-RESULTS.json) records the successful local checks:
 
-- All 40 exported runtime files served correctly beneath `/googlesite/`, with JavaScript MIME types and a trailing-slash redirect.
+- All 46 exported runtime files served correctly beneath `/googlesite/`, with JavaScript MIME types and a trailing-slash redirect.
 - Private project files remained inaccessible through the preview server.
 - The hosted version played in a cross-origin sandboxed iframe with gamepad access explicitly denied.
 - The standalone version played in an opaque-origin sandbox with gamepad access and local storage unavailable, fetching only its HTML document.
 - Character switching, new illustrated expeditions, paired bosses, keyboard movement, jumping, hole falls with damage and one-second return protection, steering, firing, special charging, all six vehicle routes, and mobile iframe layout passed without page errors.
+- Both embeds spawned the complete 20-villain roster and loaded the artwork for all 18 boss fights.
 
 These are local browser tests that reproduce iframe restrictions. They do not claim publication or testing inside a signed-in, published Google Site.
 

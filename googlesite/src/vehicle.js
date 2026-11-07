@@ -1,5 +1,6 @@
 import {HEROES,DIFFICULTIES,SPECIAL_CHARGE,clamp,seeded} from './data.js';
 import {approach} from './combat.js';
+import {VEHICLE_VILLAINS} from './bosses.js';
 
 export const VEHICLES=Object.freeze({
  thundertank:{name:'THUNDERTANK',row:0,hull:240,speed:245,width:104,height:128,fire:.22,power:24,boost:'OVERDRIVE',special:'CANNON BARRAGE',ground:true},
@@ -8,15 +9,15 @@ export const VEHICLES=Object.freeze({
 });
 export const VEHICLE_MISSIONS=[
  {id:'tank-run',name:'THUNDERTANK · CANYON RUN',tag:'Break the blockade',vehicle:'thundertank',terrain:0,length:10500,scrollSpeed:145,boss:'FISTPOUNDER',bossType:'fistpounder',sections:['CANYON ROAD','MUTANT MINEFIELD','PLUN-DARR BLOCKADE'],story:'Drive the Thundertank through the canyon. Break the NoseDiver blockade and defeat Monkian’s Fistpounder.'},
- {id:'claw-flight',name:'THUNDERCLAW · SKY CHASE',tag:'Take back the skies',vehicle:'thunderclaw',terrain:1,length:11800,scrollSpeed:175,boss:'SKYCUTTER COMMANDER',bossType:'skycutter',sections:['FOREST CANOPY','STORM PASS','SKYCUTTER SQUADRON'],story:'Pilot the ThunderClaw above Third Earth. Weave through cliffs and clouds, then defeat the Skycutter squadron.'},
- {id:'feliner-flight',name:'FELINER · ORBITAL ASSAULT',tag:'Intercept the Ratstar',vehicle:'feliner',terrain:2,length:13500,scrollSpeed:195,boss:'RATAR-O’S RATSTAR',bossType:'ratstar',sections:['LOW ORBIT','ASTEROID BELT','RATSTAR INTERCEPT'],story:'Launch the Feliner into orbit. Cross the asteroid belt and stop Ratar-O’s Ratstar before returning to the Black Pyramid.'}
-].map(s=>({...s,mode:'vehicle',theme:s.id}));
+ {id:'claw-flight',name:'THUNDERCLAW · SKY CHASE',tag:'Take back the skies',vehicle:'thunderclaw',terrain:1,length:11800,scrollSpeed:175,bossType:'skycutter',sections:['FOREST CANOPY','STORM PASS','SKYCUTTER SQUADRON'],story:'Pilot the ThunderClaw above Third Earth. Weave through cliffs and clouds, then face Vultureman’s Skycutter.'},
+ {id:'feliner-flight',name:'FELINER · ORBITAL ASSAULT',tag:'Intercept the Ratstar',vehicle:'feliner',terrain:2,length:13500,scrollSpeed:195,bossType:'ratstar',sections:['LOW ORBIT','ASTEROID BELT','RATSTAR INTERCEPT'],story:'Launch the Feliner into orbit. Cross the asteroid belt and intercept Ratar-O’s Ratstar.'}
+].map(s=>({...s,boss:VEHICLE_VILLAINS[s.bossType].name,mode:'vehicle',theme:s.id}));
 export const EXTRA_VEHICLE_MISSIONS=[
- {...VEHICLE_MISSIONS[0],id:'tank-ice',theme:'tank-ice',name:'THUNDERTANK · GLACIER RUN',tag:'Break the frozen blockade',length:12500,scrollSpeed:165,environment:'ice',bossTier:2,sections:['FROZEN CANYON','ICE MINEFIELDS','ARMORED FISTPOUNDER'],story:'Drive the original Thundertank across a glacier road. Ice slows steering recovery, and an upgraded Fistpounder lays mines during its cannon volleys.'},
- {...VEHICLE_MISSIONS[1],id:'claw-tempest',theme:'claw-tempest',name:'THUNDERCLAW · TEMPEST STRIKE',tag:'Fly into the thunderstorm',length:13800,scrollSpeed:195,environment:'storm',bossTier:2,sections:['RAIN FRONT','LIGHTNING CORRIDOR','SKYCUTTER CROSSFIRE'],story:'Pilot the ThunderClaw through crosswinds and marked lightning strikes. The commander mixes aimed fans and rotating fire.'},
- {...VEHICLE_MISSIONS[2],id:'feliner-deep',theme:'feliner-deep',name:'FELINER · DEEP SPACE',tag:'Pursue Ratar-O',length:15000,scrollSpeed:215,environment:'nebula',bossTier:3,sections:['THE VIOLET NEBULA','DEBRIS GAUNTLET','RATSTAR DREADNOUGHT'],story:'Take the Feliner into a violet nebula. Thread dense debris and defeat the Ratstar’s three-phase orbital barrage.'}
-];
-const ENEMY={skycutter:{row:0,hp:66,width:73,height:88,speed:100,fire:2.1},nosediver:{row:1,hp:105,width:82,height:114,speed:86,fire:2.7},fistpounder:{row:2,hp:1800,width:220,height:205,speed:40,fire:.95},ratstar:{row:3,hp:2300,width:295,height:210,speed:30,fire:.85}};
+ {...VEHICLE_MISSIONS[0],id:'tank-ice',theme:'tank-ice',name:'THUNDERTANK · GLACIER RUN',tag:'Break the frozen blockade',length:12500,scrollSpeed:165,environment:'ice',bossTier:2,bossType:'lunatacker',sections:['FROZEN CANYON','ICE MINEFIELDS','GRAVITY BLOCKADE'],story:'Drive the Thundertank across a glacier road. Tug-Mug brings the Luna Tacker and his gravity weapon to the blockade.'},
+ {...VEHICLE_MISSIONS[1],id:'claw-tempest',theme:'claw-tempest',name:'THUNDERCLAW · TEMPEST STRIKE',tag:'Fly into the thunderstorm',length:13800,scrollSpeed:195,environment:'storm',bossTier:2,bossType:'skytomb',sections:['RAIN FRONT','LIGHTNING CORRIDOR','THE SKYTOMB'],story:'Pilot the ThunderClaw through crosswinds and marked lightning strikes. Alluro attacks from Skytomb with mind-control pulses.'},
+ {...VEHICLE_MISSIONS[2],id:'feliner-deep',theme:'feliner-deep',name:'FELINER · DEEP SPACE',tag:'Intercept Captain Shiner',length:15000,scrollSpeed:215,environment:'nebula',bossTier:3,bossType:'vertus',sections:['THE VIOLET NEBULA','DEBRIS GAUNTLET','THE VERTUS'],story:'Thread the nebula’s debris and dodge the laser lanes of Captain Shiner’s Vertus cruiser.'}
+].map(s=>({...s,boss:VEHICLE_VILLAINS[s.bossType].name}));
+const ENEMY={skycutter:{row:0,hp:66,width:73,height:88,speed:100,fire:2.1},nosediver:{row:1,hp:105,width:82,height:114,speed:86,fire:2.7},fistpounder:{row:2,hp:1800,width:220,height:205,speed:40,fire:.95},ratstar:{row:3,hp:2300,width:295,height:210,speed:30,fire:.85},lunatacker:{hp:1800,width:172,height:223},skytomb:{hp:1780,width:217,height:237},vertus:{hp:2190,width:227,height:229}};
 let id=0;
 export class VehicleGame{
  constructor({mission=VEHICLE_MISSIONS[0],pilot,difficulty='normal',onEvent=()=>{},seed=1985,score=0,kills=0,time=0,bestCombo=0}={}){
@@ -28,7 +29,7 @@ export class VehicleGame{
  emit(type,data={}){this.onEvent(type,data);}
  clearInput(){}
  burst(x,y,color,count=12){for(let i=0;i<count;i++)this.particles.push({x,y,vx:(this.random()-.5)*190,vy:(this.random()-.5)*190,life:.3+this.random()*.3,color,size:2+this.random()*4});}
- spawn(type,x,y=-90,boss=false){const s=ENEMY[type],tier=this.stage.bossTier||1;const e={id:id++,type,row:s.row,x,y,prevX:x,prevY:y,baseX:x,age:0,width:boss?s.width* (type==='skycutter'?2.1:1)*(1+tier*.06):s.width,height:boss?s.height*(type==='skycutter'?1.8:1)*(1+tier*.06):s.height,hp:(boss&&type==='skycutter'?1500:s.hp)*this.rules.health*(boss?1.15+tier*.12:1),maxHp:0,boss,fireCd:boss?1.6:1.5+this.random(),flash:0,phase:0,shot:false,pattern:0};e.maxHp=e.hp;this.enemies.push(e);return e;}
+ spawn(type,x,y=-90,boss=false){const s=ENEMY[type],tier=this.stage.bossTier||1,profile=boss?VEHICLE_VILLAINS[type]:null;const e={id:id++,type,row:s.row,villain:profile?.id,bossArt:profile?.art,x,y,prevX:x,prevY:y,baseX:x,age:0,width:boss?s.width* (type==='skycutter'?2.1:1)*(1+tier*.06):s.width,height:boss?s.height*(type==='skycutter'?1.8:1)*(1+tier*.06):s.height,hp:(boss&&type==='skycutter'?1500:s.hp)*this.rules.health*(boss?1.15+tier*.12:1),maxHp:0,boss,fireCd:boss?1.6:1.5+this.random(),flash:0,phase:0,shot:false,pattern:0};e.maxHp=e.hp;this.enemies.push(e);return e;}
  spawnFormation(){
   const type=this.stage.vehicle==='thundertank'?'nosediver':'skycutter',count=3+Math.min(2,this.sectionIndex),pattern=this.wave++%4;
   for(let i=0;i<count;i++){
@@ -52,7 +53,7 @@ export class VehicleGame{
   if(charge)this.ship.energy=clamp(this.ship.energy+SPECIAL_CHARGE.hit,0,100);
   this.combo++;this.comboTimer=1.8;this.bestCombo=Math.max(this.bestCombo,this.combo);this.burst(e.x,e.y,'#ffd687',3);
   if(e.hp<=0){this.kills++;this.players[0].kills++;this.score+=e.boss?5000:250;this.burst(e.x,e.y,e.boss?'#ffd1a0':'#f2a76c',e.boss?45:16);this.emit(e.boss?'bossDefeated':'break');
-   if(e.boss){this.bossDefeated=true;this.projectiles=[];for(const minor of this.enemies)if(!minor.boss)minor.hp=0;this.shake=12;}
+   if(e.boss){this.bossDefeated=true;this.projectiles=[];this.hazards=[];for(const minor of this.enemies)if(!minor.boss)minor.hp=0;this.shake=12;}
    else if(this.random()<.22)this.pickups.push({x:e.x,y:e.y,type:this.random()<.7?'repair':'power'});
   }
  }
@@ -62,7 +63,9 @@ export class VehicleGame{
  }
  enemyFire(e){
   const boss=e.boss,p=this.ship,phase=e.phase||0,pattern=boss?e.pattern++%3:0,count=boss?5+phase*2:1,angle=Math.atan2(p.y-e.y,p.x-e.x);
-  for(let i=0;i<count;i++){const a=pattern===1?Math.PI*.15+i*Math.PI*.7/(count-1):pattern===2?Math.PI*.5+(i-(count-1)/2)*.18+Math.sin(e.age)*.3:angle+(i-(count-1)/2)*(boss?.2:0),speed=boss?155+phase*15:155;this.projectiles.push({x:e.x,y:e.y+e.height*.3,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:boss?6:5,power:boss?22:15,life:5});}
+  const weapon=boss?VEHICLE_VILLAINS[e.type]?.pattern:null,spread={cannon:.17,crossfire:.25,orbit:.21,gravity:.27,psych:.3,laser:.13}[weapon]||.2;
+  for(let i=0;i<count;i++){const a=pattern===1?Math.PI*.15+i*Math.PI*.7/(count-1):pattern===2?Math.PI*.5+(i-(count-1)/2)*spread+Math.sin(e.age)*.3:angle+(i-(count-1)/2)*(boss?spread:0),speed=boss?(weapon==='gravity'?128:weapon==='laser'?175:155)+phase*15:155,offset=weapon==='crossfire'?(i%2?1:-1)*e.width*.26:0;this.projectiles.push({x:e.x+offset,y:e.y+e.height*.3,vx:Math.cos(a)*speed,vy:Math.sin(a)*speed,r:boss?6:5,power:boss?22:15,life:5,weapon});}
+  if(pattern===2&&['gravity','psych','laser'].includes(weapon))this.hazards.push({kind:weapon,x:p.x,y:p.y,r:weapon==='laser'?43:70,elapsed:0,delay:1.45,life:1.8,hit:false});
   if(boss&&phase>0&&pattern===2){if(e.type==='fistpounder')for(const x of [180,780])this.obstacles.push({x,y:e.y+70,r:24,hp:60,type:'mine',seed:e.age});else if(this.enemies.length<8)this.spawn('skycutter',e.x<480?780:180,-80);}
   e.shot=true;e.flash=Math.max(e.flash,.05);
  }
@@ -72,8 +75,8 @@ export class VehicleGame{
   if((input.jumpPressed||input.dodgePressed)&&p.boostCd<=0){p.boost=.65;p.boostCd=2.4;p.invuln=Math.max(p.invuln,.48);this.emit('dodge');}
   const mx=input.moveX??Number(!!input.right)-Number(!!input.left),my=input.moveY??Number(!!input.down)-Number(!!input.up),length=Math.max(1,Math.hypot(mx,my)),speed=s.speed*(p.boost>0?1.65:1);
   const grip=this.stage.environment==='ice'&&Math.hypot(mx,my)<.03?500:2200;p.vx=approach(p.vx,mx/length*speed,grip*dt);p.vy=approach(p.vy,my/length*speed,grip*dt);const wind=this.stage.environment==='storm'?Math.sin(this.stageTime*.8)*30:0;p.x=clamp(p.x+(p.vx+wind)*dt,70+s.width*.22,890-s.width*.22);p.y=clamp(p.y+p.vy*dt,145,470);p.tilt=approach(p.tilt,p.vx/s.speed,6*dt);
-  this.hazardClock-=dt;if(this.stage.environment==='storm'&&this.hazardClock<=0){this.hazardClock=5;this.hazards.push({x:p.x,y:p.y,r:70,elapsed:0,delay:1.4,life:1.75,hit:false});}
-  for(const h of this.hazards){h.elapsed+=dt;h.life-=dt;if(!h.hit&&h.elapsed>=h.delay){h.hit=true;if(Math.hypot(h.x-p.x,h.y-p.y)<h.r)this.damage(24);this.burst(h.x,h.y,'#a9edff',20);}}this.hazards=this.hazards.filter(h=>h.life>0);
+  this.hazardClock-=dt;if(!this.bossDefeated&&this.stage.environment==='storm'&&this.hazardClock<=0){this.hazardClock=5;this.hazards.push({kind:'lightning',x:p.x,y:p.y,r:70,elapsed:0,delay:1.4,life:1.75,hit:false});}
+  for(const h of this.hazards){h.elapsed+=dt;h.life-=dt;if(!h.hit&&h.elapsed>=h.delay){h.hit=true;if(h.kind==='laser'?Math.abs(h.x-p.x)<h.r:Math.hypot(h.x-p.x,h.y-p.y)<h.r)this.damage(h.kind==='laser'?28:22);this.burst(h.x,h.y,'#a9edff',20);}}this.hazards=this.hazards.filter(h=>h.life>0);
   if(input.attack||input.attackPressed)this.shoot();if(input.specialPressed)this.special();
   const scroll=this.bossStarted&&!this.bossDefeated?this.stage.scrollSpeed*.3:this.stage.scrollSpeed*(p.boost>0?1.25:1);
   this.prevScroll=this.scroll;this.scroll+=scroll*dt;this.trackClock+=scroll*dt;
